@@ -35,4 +35,4 @@ namespace Ludix.Models
 
     }
 }
-}
+
