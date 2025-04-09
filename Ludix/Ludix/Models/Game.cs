@@ -71,7 +71,7 @@ public class Game
     /// FK para referenciar o desenvolver do jogo
     /// </summary>
     [Display(Name = "Desenvolvedor")]
-    public User Developer { get; set; }
+    public Developer Developer { get; set; }
 
     // Relacionamentos M-N
 
