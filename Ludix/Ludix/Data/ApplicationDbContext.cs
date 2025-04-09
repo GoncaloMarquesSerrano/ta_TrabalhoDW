@@ -20,14 +20,20 @@ namespace Ludix.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            
+
+            modelBuilder.Entity<User>()
+                .HasDiscriminator<string>("Discriminator")
+                .HasValue<User>("User")
+                .HasValue<Developer>("Developer");
+
+
             modelBuilder.Entity<Game>()
                 .HasOne(g => g.Developer)
                 .WithMany()
                 .HasForeignKey(g => g.DeveloperFk)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            
+
             modelBuilder.Entity<Game>()
                 .HasMany(g => g.Genres)
                 .WithMany(g => g.Games)
@@ -36,39 +42,34 @@ namespace Ludix.Data
                     j => j.HasOne<Genre>().WithMany().HasForeignKey("GenreId"),
                     j => j.HasOne<Game>().WithMany().HasForeignKey("GameId"));
 
-            
+
             modelBuilder.Entity<Purchase>()
                 .HasOne(p => p.User)
                 .WithMany()
                 .HasForeignKey(p => p.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-           
+
             modelBuilder.Entity<Purchase>()
                 .HasOne(p => p.Game)
                 .WithMany(g => g.Purchases)
                 .HasForeignKey(p => p.GameId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            
+
             modelBuilder.Entity<Review>()
                 .HasOne(r => r.User)
                 .WithMany()
                 .HasForeignKey(r => r.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            
+
             modelBuilder.Entity<Review>()
                 .HasOne(r => r.Game)
                 .WithMany(g => g.Reviews)
                 .HasForeignKey(r => r.GameId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            
-            modelBuilder.Entity<Developer>()
-                .HasBaseType<User>();
-
-            
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Email)
                 .IsUnique();

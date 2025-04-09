@@ -234,7 +234,7 @@ namespace Ludix.Migrations
 
             modelBuilder.Entity("Ludix.Models.Game", b =>
                 {
-                    b.HasOne("Ludix.Models.User", "Developer")
+                    b.HasOne("Ludix.Models.Developer", "Developer")
                         .WithMany()
                         .HasForeignKey("DeveloperFk")
                         .OnDelete(DeleteBehavior.Restrict)

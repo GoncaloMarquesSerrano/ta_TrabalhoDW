@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ludix.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250409183530_PrimeiraMigracao")]
-    partial class PrimeiraMigracao
+    [Migration("20250409190027_ConsertarDeveloper")]
+    partial class ConsertarDeveloper
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -237,7 +237,7 @@ namespace Ludix.Migrations
 
             modelBuilder.Entity("Ludix.Models.Game", b =>
                 {
-                    b.HasOne("Ludix.Models.User", "Developer")
+                    b.HasOne("Ludix.Models.Developer", "Developer")
                         .WithMany()
                         .HasForeignKey("DeveloperFk")
                         .OnDelete(DeleteBehavior.Restrict)
