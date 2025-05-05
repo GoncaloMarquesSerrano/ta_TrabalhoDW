@@ -1,19 +1,11 @@
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+ï»¿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Ludix.Data;
-using Ludix.Models;
-
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<LudixContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("LudixContext") ?? throw new InvalidOperationException("Connection string 'LudixContext' not found.")));
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-
-// define o tipo de Db e a sua "ligação"
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+// Add services to the container.
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -25,17 +17,12 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-else
-{
-    app.UseDeveloperExceptionPage(); // Para exibir detalhes de erros em desenvolvimento
-}
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
