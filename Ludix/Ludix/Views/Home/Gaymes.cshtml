@@ -1,0 +1,124 @@
+﻿@{
+    ViewData["Title"] = "Detalhes do Jogo";
+}
+
+<style>
+    body {
+        background-color: #FFFFFF;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #000000;
+    }
+
+    .game-header {
+        background-color: #000000;
+        color: #FFFFFF;
+        padding: 3rem 0;
+        margin-bottom: 2rem;
+    }
+
+    .game-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .game-description {
+        font-size: 1.2rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .action-buttons {
+        margin: 1.5rem 0;
+    }
+
+    .btn-wishlist {
+        background-color: transparent;
+        border: 2px solid #E49B0F;
+        color: #E49B0F;
+        font-weight: bold;
+        margin-right: 1rem;
+    }
+
+        .btn-wishlist:hover {
+            background-color: #E49B0F;
+            color: #000000;
+        }
+
+    .btn-buy {
+        background-color: #E49B0F;
+        border: 2px solid #E49B0F;
+        color: #000000;
+        font-weight: bold;
+    }
+
+        .btn-buy:hover {
+            background-color: #000000;
+            color: #E49B0F;
+            border-color: #000000;
+        }
+
+    .details-section {
+        margin: 3rem 0;
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        border-bottom: 3px solid #E49B0F;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
+        color: #000000;
+    }
+
+    .detail-item {
+        margin-bottom: 1.5rem;
+    }
+
+    .detail-label {
+        font-weight: 600;
+        color: #E49B0F;
+    }
+
+    .divider {
+        height: 2px;
+        background-color: #E49B0F;
+        margin: 2rem 0;
+        opacity: 0.3;
+    }
+</style>
+
+<div class="game-header">
+    <div class="container">
+        <h1 class="game-title">Jogol</h1>
+        <p class="game-description">Pequena descrição</p>
+        <div class="action-buttons">
+            <button class="btn btn-wishlist btn-lg">Adiciona à tua Wishlist</button>
+            <button class="btn btn-buy btn-lg">Comprar</button>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="details-section">
+        <h2 class="section-title">Detalhes</h2>
+
+        <div class="divider"></div>
+
+        <h2 class="section-title">Comentários</h2>
+
+        <div class="detail-item">
+            <h3 class="section-title">Descrição</h3>
+            <p>Design your site on a familiar free-form canvas. Visually set up your breakpoints to make it responsive.</p>
+        </div>
+
+        <div class="detail-item">
+            <h3 class="detail-label">Data de lançamento</h3>
+            <p>22/10/1999</p>
+        </div>
+
+        <div class="detail-item">
+            <h3 class="detail-label">Publicado por</h3>
+            <p>JohnPork.LDA</p>
+        </div>
+    </div>
+</div>

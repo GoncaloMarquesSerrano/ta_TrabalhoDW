@@ -18,6 +18,11 @@ namespace Ludix.Controllers
             return View();
         }
 
+        public IActionResult Gaymes()
+        {
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();
