@@ -6,8 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Ludix.Models;
+using Ludix.Data;
 
-namespace Ludix.Data
+namespace Ludix.Controllers
 {
     public class ReviewsController : Controller
     {

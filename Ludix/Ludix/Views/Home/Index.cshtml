@@ -1,8 +1,48 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿
+@{
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<header class="header">
+    <div class="logo">Ludix</div>
+    <nav>
+        <ul>
+            <li><a href="#">Jogos</a></li>
+            <li><a href="#">Wishlist</a></li>
+            <li><a href="#">Perfil</a></li>
+            <li><a href="#">Suporte</a></li>
+            <li><a href="#">Sign in</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+    <h1 class="titulo">Destaques</h1>
+    <section class="grid">
+        @foreach (var game in Model)
+        {
+            <div class="card">
+                <div class="imagem" style="background-image: url('@game.ImageUrl');" aria-label="@game.Name"></div>
+                <h2>@game.Name</h2>
+                <p>@game.Description<br />@game.Review</p>
+            </div>
+        }
+    </section>
+</main>
+
+<footer>
+    <div class="redes">
+        <span aria-label="Instagram">📷</span>
+        <span aria-label="Facebook">📘</span>
+        <span aria-label="Spotify">🎵</span>
+        <span aria-label="LinkedIn">💼</span>
+    </div>
+    <div class="links">
+        <a href="#">Sobre nós</a>
+        <a href="#">Contactos</a>
+        <a href="#">Updates</a>
+    </div>
+</footer>
+
+
+
