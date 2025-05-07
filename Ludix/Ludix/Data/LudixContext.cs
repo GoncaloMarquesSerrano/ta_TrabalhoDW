@@ -15,5 +15,7 @@ namespace Ludix.Data
         }
 
         public DbSet<Ludix.Models.Review> Review { get; set; } = default!;
+        public DbSet<Developer> Developers { get; set; }
+
     }
 }
