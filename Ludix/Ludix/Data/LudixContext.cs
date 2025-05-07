@@ -4,10 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Ludix.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Ludix.Data
 {
-    public class LudixContext : DbContext
+    public class LudixContext : IdentityDbContext<MyUser>
     {
         public LudixContext (DbContextOptions<LudixContext> options)
             : base(options)
@@ -15,5 +16,6 @@ namespace Ludix.Data
         }
 
         public DbSet<Ludix.Models.Review> Review { get; set; } = default!;
+        public DbSet<Ludix.Models.MyUser> MyUser { get; set; } = default!;
     }
 }
