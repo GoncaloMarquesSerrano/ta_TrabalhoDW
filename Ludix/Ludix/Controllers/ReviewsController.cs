@@ -6,8 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Ludix.Models;
+using Ludix.Data;
 
-namespace Ludix.Data
+namespace Ludix.Controllers
 {
     public class ReviewsController : Controller
     {
@@ -49,7 +50,7 @@ namespace Ludix.Data
         public IActionResult Create()
         {
             ViewData["GameId"] = new SelectList(_context.Set<Game>(), "GameId", "Cover");
-            ViewData["UserId"] = new SelectList(_context.Set<User>(), "UserId", "Email");
+            ViewData["UserId"] = new SelectList(_context.Set<MyUser>(), "UserId", "Email");
             return View();
         }
 
@@ -67,7 +68,7 @@ namespace Ludix.Data
                 return RedirectToAction(nameof(Index));
             }
             ViewData["GameId"] = new SelectList(_context.Set<Game>(), "GameId", "Cover", review.GameId);
-            ViewData["UserId"] = new SelectList(_context.Set<User>(), "UserId", "Email", review.UserId);
+            ViewData["UserId"] = new SelectList(_context.Set<MyUser>(), "UserId", "Email", review.UserId);
             return View(review);
         }
 
@@ -85,7 +86,7 @@ namespace Ludix.Data
                 return NotFound();
             }
             ViewData["GameId"] = new SelectList(_context.Set<Game>(), "GameId", "Cover", review.GameId);
-            ViewData["UserId"] = new SelectList(_context.Set<User>(), "UserId", "Email", review.UserId);
+            ViewData["UserId"] = new SelectList(_context.Set<MyUser>(), "UserId", "Email", review.UserId);
             return View(review);
         }
 
@@ -122,7 +123,7 @@ namespace Ludix.Data
                 return RedirectToAction(nameof(Index));
             }
             ViewData["GameId"] = new SelectList(_context.Set<Game>(), "GameId", "Cover", review.GameId);
-            ViewData["UserId"] = new SelectList(_context.Set<User>(), "UserId", "Email", review.UserId);
+            ViewData["UserId"] = new SelectList(_context.Set<MyUser>(), "UserId", "Email", review.UserId);
             return View(review);
         }
 
