@@ -4,6 +4,7 @@ using Ludix.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ludix.Migrations
 {
     [DbContext(typeof(LudixContext))]
-    partial class LudixContextModelSnapshot : ModelSnapshot
+    [Migration("20250507105054_UpdateUserModel")]
+    partial class UpdateUserModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,7 +37,7 @@ namespace Ludix.Migrations
 
                     b.HasIndex("GenresGenreId");
 
-                    b.ToTable("GameGenre", (string)null);
+                    b.ToTable("GameGenre");
                 });
 
             modelBuilder.Entity("Ludix.Models.Developer", b =>
@@ -63,7 +66,7 @@ namespace Ludix.Migrations
 
                     b.HasIndex("AspNetUserUserId");
 
-                    b.ToTable("Developer", (string)null);
+                    b.ToTable("Developer");
                 });
 
             modelBuilder.Entity("Ludix.Models.Game", b =>
@@ -102,7 +105,7 @@ namespace Ludix.Migrations
 
                     b.HasIndex("DeveloperFk");
 
-                    b.ToTable("Game", (string)null);
+                    b.ToTable("Game");
                 });
 
             modelBuilder.Entity("Ludix.Models.Genre", b =>
@@ -120,7 +123,7 @@ namespace Ludix.Migrations
 
                     b.HasKey("GenreId");
 
-                    b.ToTable("Genre", (string)null);
+                    b.ToTable("Genre");
                 });
 
             modelBuilder.Entity("Ludix.Models.MyUser", b =>
@@ -152,7 +155,7 @@ namespace Ludix.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("MyUser", (string)null);
+                    b.ToTable("MyUser");
                 });
 
             modelBuilder.Entity("Ludix.Models.Purchase", b =>
@@ -181,7 +184,7 @@ namespace Ludix.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Purchase", (string)null);
+                    b.ToTable("Purchase");
                 });
 
             modelBuilder.Entity("Ludix.Models.Review", b =>
@@ -215,7 +218,7 @@ namespace Ludix.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Review", (string)null);
+                    b.ToTable("Review");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

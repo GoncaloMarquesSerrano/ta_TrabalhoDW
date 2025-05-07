@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Ludix.Data
 {
-    public class LudixContext : IdentityDbContext<MyUser>
+    public class LudixContext : IdentityDbContext
     {
         public LudixContext (DbContextOptions<LudixContext> options)
             : base(options)
