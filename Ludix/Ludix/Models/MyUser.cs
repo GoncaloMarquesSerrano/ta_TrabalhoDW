@@ -1,10 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 namespace Ludix.Models
 {
     /// <summary>
     /// Tabela que representa um utilizador.
     /// </summary>
-    public class MyUser
+    public class MyUser : IdentityUser
     {
         /// <summary>
         /// Id do utilizador
@@ -28,15 +29,6 @@ namespace Ludix.Models
         public string Email { get; set; }
 
         /// <summary>
-        /// Senha do utilizador
-        /// </summary>
-        [Display(Name = "Senha")]
-        [Required(ErrorMessage = "O campo {0} é obrigatório.")]
-        [StringLength(50, ErrorMessage = "O campo {0} deve ter entre {2} e {1} caracteres.", MinimumLength = 8)]
-        [DataType(DataType.Password)]
-        public string Password { get; set; }
-
-        /// <summary>
         /// Saldo do utilizador
         /// </summary>
         [Display(Name = "Saldo")]
@@ -52,6 +44,12 @@ namespace Ludix.Models
         [Required(ErrorMessage = "O campo {0} é obrigatório.")]
         [DataType(DataType.Date)]
         public DateTime CreatedAt { get; set; }
+
+
+        /// <summary>
+        /// Nome do utilizador no ASP.NET Identity
+        /// </summary>
+        public string AspUser { get; set; } = string.Empty;
     }
 }
 
