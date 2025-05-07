@@ -5,10 +5,8 @@ namespace Ludix.Models
     /// <summary>
     /// Tabela que representa um desenvolvedor de jogos sendo este uma expecializacao de um user
     /// </summary>
-    public class Developer 
+    public class Developer: MyUser
     {
-        [Key]
-        public int id { get; set; }
         /// <summary>
         /// Website do desenvolvedor
         /// </summary>

@@ -4,7 +4,7 @@ namespace Ludix.Models
     /// <summary>
     /// Tabela que representa um utilizador.
     /// </summary>
-    public class User
+    public class MyUser
     {
         /// <summary>
         /// Id do utilizador
@@ -16,8 +16,6 @@ namespace Ludix.Models
         /// Nome do utilizador
         /// </summary>
         [Display(Name = "Nome")]
-        [Required(ErrorMessage = "O campo {0} é obrigatório.")]
-        [StringLength(25, ErrorMessage = "O campo {0} deve ter entre {2} e {1} caracteres.", MinimumLength = 5)]
         public string Username { get; set; }
 
         /// <summary>

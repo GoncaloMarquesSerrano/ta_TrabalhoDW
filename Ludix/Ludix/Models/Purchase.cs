@@ -45,7 +45,7 @@ namespace Ludix.Models
         /// FK para referenciar o utilizador que fez a compra
         /// </summary>
         [Display(Name = "Utilizador")]
-        public User User { get; set; }
+        public MyUser User { get; set; }
 
         /// <summary>
         /// FK para referenciar o jogo que foi comprado
