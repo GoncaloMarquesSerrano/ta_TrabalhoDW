@@ -5,7 +5,7 @@ namespace Ludix.Models
     /// <summary>
     /// Tabela que representa um utilizador.
     /// </summary>
-    public class MyUser : IdentityUser
+    public class MyUser
     {
         /// <summary>
         /// Id do utilizador
@@ -17,6 +17,7 @@ namespace Ludix.Models
         /// Nome do utilizador
         /// </summary>
         [Display(Name = "Nome")]
+        [Required(ErrorMessage = "O campo {0} é obrigatório.")]
         public string Username { get; set; }
 
         /// <summary>
@@ -49,6 +50,7 @@ namespace Ludix.Models
         /// <summary>
         /// Nome do utilizador no ASP.NET Identity
         /// </summary>
+        [Required]
         public string AspUser { get; set; } = string.Empty;
     }
 }

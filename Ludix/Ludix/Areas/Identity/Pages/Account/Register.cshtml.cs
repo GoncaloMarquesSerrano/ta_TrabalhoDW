@@ -128,9 +128,18 @@ namespace Ludix.Areas.Identity.Pages.Account
 
                 if (result.Succeeded)
                 {
+                    if (Input.MyUser == null)
+                    {
+                        Input.MyUser = new MyUser();
+                    }
                     bool existsError = false;
 
                     Input.MyUser.AspUser = Input.Email;
+                    Input.MyUser.AspUser = user.Id;
+                    Input.MyUser.Email = Input.Email;
+                    Input.MyUser.Username = Input.Email;
+                    Input.MyUser.CreatedAt = DateTime.Now;
+                    Input.MyUser.Balance = 0; 
 
                     try
                     {

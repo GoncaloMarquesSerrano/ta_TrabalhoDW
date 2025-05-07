@@ -38,14 +38,14 @@ namespace Ludix.Models
         /// FK para referenciar o utilizador que fez a compra
         /// </summary>
         [Display(Name = "Utilizador")]
-        [ForeignKey(nameof(User))]
-        public int UserId { get; set; }
+        [ForeignKey(nameof(MyUser))]
+        public int UserId { get; set; } 
 
         /// <summary>
         /// FK para referenciar o utilizador que fez a compra
         /// </summary>
         [Display(Name = "Utilizador")]
-        public MyUser User { get; set; }
+        public MyUser MyUser { get; set; }
 
         /// <summary>
         /// FK para referenciar o jogo que foi comprado

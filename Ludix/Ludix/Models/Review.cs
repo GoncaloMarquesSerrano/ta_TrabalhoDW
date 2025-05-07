@@ -45,14 +45,14 @@ namespace Ludix.Models
         /// <summary>
         /// FK para referenciar o utilizador que fez a avaliacao
         /// </summary>
-        [ForeignKey(nameof(User))]
+        [ForeignKey(nameof(MyUser))]
         [Display(Name = "Utilizador")]
         public int UserId { get; set; }
         /// <summary>
         /// FK para referenciar o utilizador que fez a avaliacao
         /// </summary>
         [Display(Name = "Utilizador")]
-        public MyUser User { get; set; }
+        public MyUser MyUser { get; set; }
 
         /// <summary>
         /// FK para referenciar o jogo que foi avaliado
