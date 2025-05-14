@@ -50,63 +50,41 @@ namespace Ludix.Areas.Identity.Pages.Account
             _context = context;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public string ReturnUrl { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
-        /// 
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [Required]
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [Required]
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "Password")]
             public string Password { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [DataType(DataType.Password)]
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
 
-            public MyUser MyUser { get; set; }
-        }
+            [Display(Name = "Nome de utilizador")]
+            [Required(ErrorMessage = "O nome de utilizador é obrigatório")]
+            public string Username { get; set; }
 
+            [Display(Name = "Solicitar ser desenvolvedor")]
+            public bool RequestDeveloper { get; set; }
+
+            [Display(Name = "Website (para desenvolvedores)")]
+            public string Website { get; set; }
+        }
 
         public async Task OnGetAsync(string returnUrl = null)
         {
@@ -118,67 +96,90 @@ namespace Ludix.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
             if (ModelState.IsValid)
             {
-                var user = CreateUser();
+                var identityUser = CreateUser();
 
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-                var result = await _userManager.CreateAsync(user, Input.Password);
+                await _userStore.SetUserNameAsync(identityUser, Input.Email, CancellationToken.None);
+                await _emailStore.SetEmailAsync(identityUser, Input.Email, CancellationToken.None);
+                var result = await _userManager.CreateAsync(identityUser, Input.Password);
 
                 if (result.Succeeded)
                 {
-                    if (Input.MyUser == null)
-                    {
-                        Input.MyUser = new MyUser();
-                    }
                     bool existsError = false;
 
-                    Input.MyUser.AspUser = Input.Email;
-                    Input.MyUser.AspUser = user.Id;
-                    Input.MyUser.Email = Input.Email;
-                    Input.MyUser.Username = Input.Email;
-                    Input.MyUser.CreatedAt = DateTime.Now;
-                    Input.MyUser.Balance = 0; 
+                    // Criar utilizador normal (todos começam como MyUser)
+                    var myUser = new MyUser
+                    {
+                        AspUser = identityUser.Id,
+                        Email = Input.Email,
+                        Username = Input.Username,
+                        CreatedAt = DateTime.Now,
+                        Balance = 0,
+                        IsAdmin = false // Por padrão, não é admin
+                    };
+
+                    // Se solicitou ser desenvolvedor, adiciona os campos de solicitação
+                    if (Input.RequestDeveloper)
+                    {
+                        myUser.RequestedDeveloper = true;
+                        myUser.ProposedWebsite = Input.Website;
+                        myUser.DeveloperRequestDate = DateTime.Now;
+                    }
 
                     try
                     {
-                        _context.Add(Input.MyUser);
+                        _context.Add(myUser);
                         await _context.SaveChangesAsync();
+
+                        // Se for o primeiro utilizador registado, torná-lo administrador
+                        if (_context.MyUser.Count() == 1)
+                        {
+                            myUser.IsAdmin = true;
+                            await _context.SaveChangesAsync();
+                        }
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
                         existsError = true;
+                        _logger.LogError(ex, "Erro ao criar utilizador");
                         ModelState.AddModelError(string.Empty, "Erro na criação do utilizador.");
-
                     }
 
                     if (!existsError)
                     {
-                        var userId = await _userManager.GetUserIdAsync(user);
-                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        var userId = await _userManager.GetUserIdAsync(identityUser);
+                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(identityUser);
                         code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                         var callbackUrl = Url.Page(
                             "/Account/ConfirmEmail",
                             pageHandler: null,
                             values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                             protocol: Request.Scheme);
-                        await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                        await _emailSender.SendEmailAsync(Input.Email, "Confirme seu email",
+                            $"Por favor, confirme a sua conta <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>aqui</a>.");
+
+                        if (Input.RequestDeveloper)
+                        {
+                            TempData["Message"] = "O seu pedido para se tornar desenvolvedor foi enviado. Um administrador irá analisar a sua solicitação.";
+                        }
+
                         if (_userManager.Options.SignIn.RequireConfirmedAccount)
                         {
                             return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
                         }
                         else
                         {
-                            await _signInManager.SignInAsync(user, isPersistent: false);
+                            await _signInManager.SignInAsync(identityUser, isPersistent: false);
                             return LocalRedirect(returnUrl);
                         }
                     }
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
+                }
+
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
 

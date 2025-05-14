@@ -52,6 +52,30 @@ namespace Ludix.Models
         /// </summary>
         [Required]
         public string AspUser { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Indica se o utilizador é administrador
+        /// </summary>
+        [Display(Name = "Administrador")]
+        public bool IsAdmin { get; set; } = false;
+
+        /// <summary>
+        /// Indica se o utilizador solicitou se tornar desenvolvedor
+        /// </summary>
+        [Display(Name = "Solicitou ser desenvolvedor")]
+        public bool RequestedDeveloper { get; set; } = false;
+
+        /// <summary>
+        /// Website proposto para quando se tornar desenvolvedor (se solicitado)
+        /// </summary>
+        [Display(Name = "Website proposto")]
+        public string? ProposedWebsite { get; set; }
+
+        /// <summary>
+        /// Data da solicitação para se tornar desenvolvedor
+        /// </summary>
+        [Display(Name = "Data da solicitação")]
+        public DateTime? DeveloperRequestDate { get; set; }
     }
 }
 
