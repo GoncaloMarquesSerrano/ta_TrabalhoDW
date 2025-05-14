@@ -18,7 +18,7 @@ namespace Ludix.Models
         /// </summary>
         [Display(Name = "Nome")]
         [Required(ErrorMessage = "O campo {0} é obrigatório.")]
-        public string Username { get; set; }
+        public string Username { get; set; } = string.Empty;
 
         /// <summary>
         /// Email do utilizador
@@ -27,7 +27,7 @@ namespace Ludix.Models
         [Required(ErrorMessage = "O campo {0} é obrigatório.")]
         [EmailAddress(ErrorMessage = "O campo {0} não é um endereço de email válido.")]
         [StringLength(50, ErrorMessage = "O campo {0} deve ter no máximo {1} caracteres.")]
-        public string Email { get; set; }
+        public string Email { get; set; } = string.Empty;
 
         /// <summary>
         /// Saldo do utilizador
