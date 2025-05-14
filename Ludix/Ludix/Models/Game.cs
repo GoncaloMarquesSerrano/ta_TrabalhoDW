@@ -20,7 +20,7 @@ public class Game
     [Display(Name = "Título")]
     [Required(ErrorMessage = "O campo {0} é obrigatório.")]
     [StringLength(50, ErrorMessage = "O campo {0} deve ter entre {2} e {1} caracteres.", MinimumLength = 3)]
-    public string Title { get; set; }
+    public string Title { get; set; } = string.Empty;
 
     /// <summary>
     /// Preco do jogo
@@ -36,7 +36,7 @@ public class Game
     [Display(Name = "Descrição")]
     [Required(ErrorMessage = "O campo {0} é obrigatório.")]
     [StringLength(500, ErrorMessage = "O campo {0} deve ter entre {2} e {1} caracteres.", MinimumLength = 10)]
-    public string Description { get; set; }
+    public string Description { get; set; } = string.Empty;
 
     /// <summary>
     /// Data de lancamento do jogo
@@ -52,7 +52,7 @@ public class Game
     [Display(Name = "Capa")]
     [Required(ErrorMessage = "O campo {0} é obrigatório.")]
     [StringLength(50, ErrorMessage = "O campo {0} deve ter no máximo 50 caracteres")]
-    public string Cover { get; set; }
+    public string Cover { get; set; } = string.Empty;
 
     /***************************
      * Definição de relacionamentos
@@ -71,7 +71,7 @@ public class Game
     /// FK para referenciar o desenvolver do jogo
     /// </summary>
     [Display(Name = "Desenvolvedor")]
-    public Developer Developer { get; set; }
+    public Developer Developer { get; set; } = new Developer();
 
     // Relacionamentos M-N
 
@@ -79,18 +79,18 @@ public class Game
     /// Lista dos generos do jogo
     /// </summary>
     [Display(Name = "Géneros")]
-    public ICollection<Genre> Genres { get; set; }
+    public ICollection<Genre> Genres { get; set; } = [];
 
     /// <summary>
     /// Lista de utilizadores que compraram o jogo
     /// </summary>
     [Display(Name = "Compras")]
-    public ICollection<Purchase> Purchases { get; set; }
+    public ICollection<Purchase> Purchases { get; set; } = [];
 
     /// <summary>
     /// Lista das reviews do jogo feitas pelo utilizador
     /// </summary>
     [Display(Name = "Avaliações")]
-    public ICollection<Review> Reviews { get; set; }
+    public ICollection<Review> Reviews { get; set; } = [];
 
 }
