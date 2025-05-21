@@ -19,7 +19,7 @@ namespace Ludix.Models
         [Required(ErrorMessage = "O campo {0} é obrigatório.")]
         [Display(Name = "Nome do Género")]
         [StringLength(50, ErrorMessage = "O campo {0} deve ter no máximo {1} caracteres.")]
-        public string GenreName { get; set; }
+        public string GenreName { get; set; } = string.Empty;
 
         /*****************************
          * Definição de relacionamentos
@@ -31,7 +31,7 @@ namespace Ludix.Models
         /// Lista dos jogos do genero
         /// </summary>
         [Display(Name = "Jogos")]
-        public ICollection<Game> Games { get; set; }
+        public ICollection<Game> Games { get; set; } = [];
 
     }
 }
