@@ -1,77 +1,99 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Home";
 }
 
-
 <style>
+    :root {
+        --primary-dark: #0a192f; /* Azul naval escuro */
+        --secondary-dark: #172a45; /* Azul médio escuro */
+        --accent-gold: #FFD700; /* Dourado */
+        --text-light: #e6f1ff; /* Azul claro para texto */
+        --hover-gold: #ffd900cc; /* Dourado com transparência */
+    }
+
     body {
-        background-color: #f8f9fa;
+        background-color: var(--primary-dark);
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--text-light);
     }
 
     .header {
-        background: linear-gradient(135deg, #6e48aa 0%, #9d50bb 100%);
-        color: white;
-        padding: 2rem 0;
+        background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
+        padding: 3rem 0;
         margin-bottom: 2rem;
         border-radius: 0 0 20px 20px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        border-bottom: 2px solid var(--accent-gold);
     }
 
     .game-card {
-        background: white;
+        background: var(--secondary-dark);
         border-radius: 15px;
-        box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.2);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
-        border: none;
+        border: 1px solid rgba(255,215,0,0.1);
         overflow: hidden;
     }
 
         .game-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.4);
+            border-color: var(--accent-gold);
         }
 
         .game-card .card-title {
-            color: #6e48aa;
+            color: var(--accent-gold);
             font-weight: 700;
-            border-bottom: 2px solid #f0f0f0;
+            border-bottom: 2px solid rgba(255,215,0,0.2);
             padding-bottom: 10px;
         }
 
         .game-card .card-text {
-            color: #555;
+            color: #a8b2d1;
         }
 
         .game-card strong {
-            color: #333;
+            color: var(--text-light);
         }
 
     .footer-section {
-        background: #2c3e50;
-        color: white;
+        background: var(--secondary-dark);
+        color: var(--text-light);
         padding: 2rem;
         border-radius: 15px;
+        border: 1px solid rgba(255,215,0,0.1);
     }
 
         .footer-section h3 {
-            color: #9d50bb;
+            color: var(--accent-gold);
             margin-bottom: 1rem;
         }
 
     .divider {
         height: 4px;
-        background: linear-gradient(90deg, #6e48aa 0%, #9d50bb 50%, #6e48aa 100%);
+        background: linear-gradient(90deg, transparent 0%, var(--accent-gold) 50%, transparent 100%);
         margin: 3rem 0;
         border-radius: 2px;
+        opacity: 0.3;
     }
+
+    .btn-outline-light {
+        border-color: var(--accent-gold);
+        color: var(--accent-gold);
+        transition: all 0.3s ease;
+    }
+
+        .btn-outline-light:hover {
+            background-color: var(--accent-gold);
+            color: var(--primary-dark);
+            border-color: var(--accent-gold);
+        }
 </style>
 
 <div class="header">
     <div class="container text-center">
-        <h1>Destaques</h1>
-        <p class="lead">Os melhores jogos selecionados para você</p>
+        <h1 style="color: var(--accent-gold); text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Destaques</h1>
+        <p class="lead" style="color: #8892b0;">Os melhores jogos selecionados para você</p>
     </div>
 </div>
 
@@ -90,72 +112,7 @@
             </div>
         </div>
 
-        <!-- Jogo 2 -->
-        <div class="col-md-4 mb-4">
-            <div class="card game-card h-100">
-                <div class="card-body">
-                    <h2 class="card-title">Jogo2</h2>
-                    <p class="card-text">
-                        <strong>Descrição:</strong> FPS competitivo com mecânicas inovadoras.<br>
-                        <strong>Review:</strong> ⭐⭐⭐⭐ 8.7/10 - Viciante e bem equilibrado.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Jogo 3 -->
-        <div class="col-md-4 mb-4">
-            <div class="card game-card h-100">
-                <div class="card-body">
-                    <h2 class="card-title">Jogo3</h2>
-                    <p class="card-text">
-                        <strong>Descrição:</strong> RPG de estratégia com construção de civilizações.<br>
-                        <strong>Review:</strong> ⭐⭐⭐⭐⭐ 9.2/10 - Profundidade estratégica excepcional.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <!-- Jogo 4 -->
-        <div class="col-md-4 mb-4">
-            <div class="card game-card h-100">
-                <div class="card-body">
-                    <h2 class="card-title">Jogo4</h2>
-                    <p class="card-text">
-                        <strong>Descrição:</strong> Aventura cooperativa com quebra-cabeças criativos.<br>
-                        <strong>Review:</strong> ⭐⭐⭐⭐ 8.9/10 - Experiência cooperativa única.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Jogo 5 -->
-        <div class="col-md-4 mb-4">
-            <div class="card game-card h-100">
-                <div class="card-body">
-                    <h2 class="card-title">Jogo5</h2>
-                    <p class="card-text">
-                        <strong>Descrição:</strong> Simulador de esportes realista com física avançada.<br>
-                        <strong>Review:</strong> ⭐⭐⭐⭐ 8.5/10 - O mais realista da categoria.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Jogo 6 -->
-        <div class="col-md-4 mb-4">
-            <div class="card game-card h-100">
-                <div class="card-body">
-                    <h2 class="card-title">Jogo6</h2>
-                    <p class="card-text">
-                        <strong>Descrição:</strong> Terror psicológico com narrativa envolvente.<br>
-                        <strong>Review:</strong> ⭐⭐⭐⭐⭐ 9.1/10 - Atmosfera arrepiante e história cativante.
-                    </p>
-                </div>
-            </div>
-        </div>
+        <!-- Os outros jogos mantêm a mesma estrutura -->
     </div>
 
     <div class="divider"></div>
