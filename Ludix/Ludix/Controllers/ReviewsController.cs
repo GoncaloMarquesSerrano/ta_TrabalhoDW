@@ -22,7 +22,7 @@ namespace Ludix.Controllers
         // GET: Reviews
         public async Task<IActionResult> Index()
         {
-            var ludixContext = _context.Review.Include(r => r.Game).Include(r => r.User);
+            var ludixContext = _context.Review.Include(r => r.Game).Include(r => r.MyUser);
             return View(await ludixContext.ToListAsync());
         }
 
@@ -36,7 +36,7 @@ namespace Ludix.Controllers
 
             var review = await _context.Review
                 .Include(r => r.Game)
-                .Include(r => r.User)
+                .Include(r => r.MyUser)
                 .FirstOrDefaultAsync(m => m.ReviewId == id);
             if (review == null)
             {
@@ -50,7 +50,7 @@ namespace Ludix.Controllers
         public IActionResult Create()
         {
             ViewData["GameId"] = new SelectList(_context.Set<Game>(), "GameId", "Cover");
-            ViewData["UserId"] = new SelectList(_context.Set<User>(), "UserId", "Email");
+            ViewData["UserId"] = new SelectList(_context.Set<MyUser>(), "UserId", "Email");
             return View();
         }
 
@@ -68,7 +68,7 @@ namespace Ludix.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["GameId"] = new SelectList(_context.Set<Game>(), "GameId", "Cover", review.GameId);
-            ViewData["UserId"] = new SelectList(_context.Set<User>(), "UserId", "Email", review.UserId);
+            ViewData["UserId"] = new SelectList(_context.Set<MyUser>(), "UserId", "Email", review.UserId);
             return View(review);
         }
 
@@ -86,7 +86,7 @@ namespace Ludix.Controllers
                 return NotFound();
             }
             ViewData["GameId"] = new SelectList(_context.Set<Game>(), "GameId", "Cover", review.GameId);
-            ViewData["UserId"] = new SelectList(_context.Set<User>(), "UserId", "Email", review.UserId);
+            ViewData["UserId"] = new SelectList(_context.Set<MyUser>(), "UserId", "Email", review.UserId);
             return View(review);
         }
 
@@ -123,7 +123,7 @@ namespace Ludix.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["GameId"] = new SelectList(_context.Set<Game>(), "GameId", "Cover", review.GameId);
-            ViewData["UserId"] = new SelectList(_context.Set<User>(), "UserId", "Email", review.UserId);
+            ViewData["UserId"] = new SelectList(_context.Set<MyUser>(), "UserId", "Email", review.UserId);
             return View(review);
         }
 
@@ -137,7 +137,7 @@ namespace Ludix.Controllers
 
             var review = await _context.Review
                 .Include(r => r.Game)
-                .Include(r => r.User)
+                .Include(r => r.MyUser)
                 .FirstOrDefaultAsync(m => m.ReviewId == id);
             if (review == null)
             {
