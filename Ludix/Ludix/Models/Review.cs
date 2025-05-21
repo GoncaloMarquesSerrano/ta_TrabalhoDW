@@ -27,7 +27,7 @@ namespace Ludix.Models
         [Display(Name = "Texto da Avaliação")]
         [Required(ErrorMessage = "O campo {0} é obrigatório.")]
         [StringLength(500, ErrorMessage = "O campo {0} deve ter no máximo {1} caracteres.")]
-        public string ReviewText { get; set; }
+        public string ReviewText { get; set; } = string.Empty;
 
         /// <summary>
         /// Data da avaliacao do jogo
@@ -52,7 +52,7 @@ namespace Ludix.Models
         /// FK para referenciar o utilizador que fez a avaliacao
         /// </summary>
         [Display(Name = "Utilizador")]
-        public MyUser MyUser { get; set; }
+        public MyUser MyUser { get; set; } = new MyUser();
 
         /// <summary>
         /// FK para referenciar o jogo que foi avaliado
@@ -65,6 +65,6 @@ namespace Ludix.Models
         /// FK para referenciar o jogo que foi avaliado
         /// </summary>
         [Display(Name = "Jogo")]
-        public Game Game { get; set; }
+        public Game Game { get; set; } = new Game();
     }
 }

@@ -4,6 +4,7 @@ using Ludix.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ludix.Migrations
 {
     [DbContext(typeof(LudixContext))]
-    partial class LudixContextModelSnapshot : ModelSnapshot
+    [Migration("20250514075413_DeveloperMigration")]
+    partial class DeveloperMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -112,22 +115,10 @@ namespace Ludix.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DeveloperRequestDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
-
-                    b.Property<bool>("IsAdmin")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ProposedWebsite")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("RequestedDeveloper")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -409,16 +400,8 @@ namespace Ludix.Migrations
                 {
                     b.HasBaseType("Ludix.Models.MyUser");
 
-                    b.Property<DateTime>("ApprovalDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ApprovedByUserId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Website")
                         .HasColumnType("nvarchar(max)");
-
-                    b.HasIndex("ApprovedByUserId");
 
                     b.ToTable("Developers", (string)null);
                 });
@@ -540,19 +523,11 @@ namespace Ludix.Migrations
 
             modelBuilder.Entity("Ludix.Models.Developer", b =>
                 {
-                    b.HasOne("Ludix.Models.MyUser", "ApprovedBy")
-                        .WithMany()
-                        .HasForeignKey("ApprovedByUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Ludix.Models.MyUser", null)
                         .WithOne()
                         .HasForeignKey("Ludix.Models.Developer", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("ApprovedBy");
                 });
 
             modelBuilder.Entity("Ludix.Models.Game", b =>
