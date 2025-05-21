@@ -4,6 +4,7 @@ using Ludix.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ludix.Migrations
 {
     [DbContext(typeof(LudixContext))]
-    partial class LudixContextModelSnapshot : ModelSnapshot
+    [Migration("20250507101422_CreateIdentityTables")]
+    partial class CreateIdentityTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,36 +37,7 @@ namespace Ludix.Migrations
 
                     b.HasIndex("GenresGenreId");
 
-                    b.ToTable("GameGenre", (string)null);
-                });
-
-            modelBuilder.Entity("Ludix.Models.Developer", b =>
-                {
-                    b.Property<int>("DeveloperId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DeveloperId"));
-
-                    b.Property<string>("AspNetUserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("AspNetUserUserId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Website")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("DeveloperId");
-
-                    b.HasIndex("AspNetUserUserId");
-
-                    b.ToTable("Developer", (string)null);
+                    b.ToTable("GameGenre");
                 });
 
             modelBuilder.Entity("Ludix.Models.Game", b =>
@@ -102,7 +76,7 @@ namespace Ludix.Migrations
 
                     b.HasIndex("DeveloperFk");
 
-                    b.ToTable("Game", (string)null);
+                    b.ToTable("Game");
                 });
 
             modelBuilder.Entity("Ludix.Models.Genre", b =>
@@ -120,7 +94,7 @@ namespace Ludix.Migrations
 
                     b.HasKey("GenreId");
 
-                    b.ToTable("Genre", (string)null);
+                    b.ToTable("Genre");
                 });
 
             modelBuilder.Entity("Ludix.Models.MyUser", b =>
@@ -141,6 +115,11 @@ namespace Ludix.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(13)
+                        .HasColumnType("nvarchar(13)");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -152,7 +131,11 @@ namespace Ludix.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("MyUser", (string)null);
+                    b.ToTable("MyUser");
+
+                    b.HasDiscriminator().HasValue("MyUser");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Ludix.Models.Purchase", b =>
@@ -181,7 +164,7 @@ namespace Ludix.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Purchase", (string)null);
+                    b.ToTable("Purchase");
                 });
 
             modelBuilder.Entity("Ludix.Models.Review", b =>
@@ -215,7 +198,7 @@ namespace Ludix.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Review", (string)null);
+                    b.ToTable("Review");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -420,6 +403,17 @@ namespace Ludix.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Ludix.Models.Developer", b =>
+                {
+                    b.HasBaseType("Ludix.Models.MyUser");
+
+                    b.Property<string>("Website")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasDiscriminator().HasValue("Developer");
+                });
+
             modelBuilder.Entity("GameGenre", b =>
                 {
                     b.HasOne("Ludix.Models.Game", null)
@@ -433,17 +427,6 @@ namespace Ludix.Migrations
                         .HasForeignKey("GenresGenreId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Ludix.Models.Developer", b =>
-                {
-                    b.HasOne("Ludix.Models.MyUser", "AspNetUser")
-                        .WithMany()
-                        .HasForeignKey("AspNetUserUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AspNetUser");
                 });
 
             modelBuilder.Entity("Ludix.Models.Game", b =>
@@ -465,7 +448,7 @@ namespace Ludix.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Ludix.Models.MyUser", "MyUser")
+                    b.HasOne("Ludix.Models.MyUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -473,7 +456,7 @@ namespace Ludix.Migrations
 
                     b.Navigation("Game");
 
-                    b.Navigation("MyUser");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Ludix.Models.Review", b =>
@@ -484,7 +467,7 @@ namespace Ludix.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Ludix.Models.MyUser", "MyUser")
+                    b.HasOne("Ludix.Models.MyUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -492,7 +475,7 @@ namespace Ludix.Migrations
 
                     b.Navigation("Game");
 
-                    b.Navigation("MyUser");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
