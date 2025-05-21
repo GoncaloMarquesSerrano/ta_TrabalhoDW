@@ -24,6 +24,7 @@ namespace Ludix.Data
         }
 
         public DbSet<Ludix.Models.Review> Review { get; set; } = default!;
+
         public DbSet<Ludix.Models.MyUser> MyUser { get; set; } = default!;
         public DbSet<Ludix.Models.Developer> Developer { get; set; } = default!;
         public DbSet<Ludix.Models.Game> Game { get; set; } = default!;
