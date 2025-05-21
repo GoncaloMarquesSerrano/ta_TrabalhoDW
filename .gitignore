@@ -16,6 +16,10 @@
 # Mono auto generated files
 mono_crash.*
 
+#Imagens
+wwwroot/covers/*
+wwwroot/images/covers/*
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
