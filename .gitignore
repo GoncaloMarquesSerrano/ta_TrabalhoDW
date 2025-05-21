@@ -398,3 +398,6 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/Ludix/Ludix/Migrations/20250521113903_Reconstruct.Designer.cs
+/Ludix/Ludix/Migrations/20250521113903_Reconstruct.cs
+/Ludix/Ludix/wwwroot/covers/daeb6d86-d998-4c95-9f87-0d8ef672e3b9.jpg
