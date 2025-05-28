@@ -107,6 +107,28 @@
     .text-muted {
         color: #8892b0 !important;
     }
+
+    .divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        color: var(--accent-gold);
+        margin: 2rem 0;
+    }
+
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid rgba(255,215,0,0.3);
+        }
+
+        .divider::before {
+            margin-right: 1rem;
+        }
+
+        .divider::after {
+            margin-left: 1rem;
+        }
 </style>
 
 <div class="row justify-content-center">
@@ -173,7 +195,11 @@
 
             <div class="mt-5">
                 <section>
-                    <h3 class="text-center">Ou registe-se com</h3>
+
+                    <div class="divider">OU</div>
+
+                    <h3 class="text-center">Registe-se com</h3>
+
                     <hr />
 
                     @{
