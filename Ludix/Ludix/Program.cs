@@ -15,6 +15,16 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
    .AddEntityFrameworkStores<LudixContext>();
 builder.Services.AddControllersWithViews();
 
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("DeveloperOrAdmin", policy =>
+        policy.RequireAssertion(context =>
+            context.User.IsInRole("Admin") ||
+            context.User.HasClaim("IsDeveloper", "true")));
+});
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

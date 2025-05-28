@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Ludix.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "DeveloperOrAdmin")]
     public class GamesController : Controller
     {
         private readonly LudixContext _context;
@@ -26,6 +26,7 @@ namespace Ludix.Controllers
         }
 
         // GET: Games
+
         public async Task<IActionResult> Index()
         {
             var games = await _context.Game
