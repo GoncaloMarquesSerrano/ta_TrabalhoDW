@@ -1,31 +1,148 @@
 ﻿@page
 @model ExternalLoginModel
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Registro";
 }
 
-<h1>@ViewData["Title"]</h1>
-<h2 id="external-login-title">Associate your @Model.ProviderDisplayName account.</h2>
-<hr />
+<style>
+    :root {
+        --primary-dark: #0a192f;
+        --secondary-dark: #172a45;
+        --accent-gold: #FFD700;
+        --text-light: #e6f1ff;
+        --input-bg: #112240;
+        --input-border: #233554;
+        --info-blue: #4a90e2;
+    }
 
-<p id="external-login-description" class="text-info">
-    You've successfully authenticated with <strong>@Model.ProviderDisplayName</strong>.
-    Please enter an email address for this site below and click the Register button to finish
-    logging in.
-</p>
+    body {
+        background-color: var(--primary-dark);
+        color: var(--text-light);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 1rem;
+    }
 
-<div class="row">
-    <div class="col-md-4">
-        <form asp-page-handler="Confirmation" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Email" class="form-control" autocomplete="email" placeholder="Please enter your email."/>
-                <label asp-for="Input.Email" class="form-label"></label>
-                <span asp-validation-for="Input.Email" class="text-danger"></span>
-            </div>
-            <button type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
-        </form>
-    </div>
+    .external-login-container {
+        background-color: var(--secondary-dark);
+        border-radius: 10px;
+        padding: 3rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        border: 1px solid rgba(255,215,0,0.1);
+        max-width: 600px;
+        width: 100%;
+    }
+
+    h1 {
+        color: var(--accent-gold);
+        font-size: 2.2rem;
+        margin-bottom: 0.5rem;
+        text-align: center;
+    }
+
+    h2 {
+        color: var(--text-light);
+        font-size: 1.3rem;
+        font-weight: 400;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    hr {
+        border-color: rgba(255,215,0,0.2);
+        margin: 1.5rem 0;
+    }
+
+    .text-info {
+        color: var(--info-blue) !important;
+        background-color: rgba(74, 144, 226, 0.1);
+        border-left: 4px solid var(--info-blue);
+        padding: 1rem;
+        margin-bottom: 2rem;
+        border-radius: 0 4px 4px 0;
+    }
+
+    .provider-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background-color: rgba(255,215,0,0.1);
+        color: var(--accent-gold);
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        margin: 0.5rem 0;
+    }
+
+    .form-floating label {
+        color: #8892b0;
+    }
+
+    .form-control {
+        background-color: var(--input-bg);
+        border: 1px solid var(--input-border);
+        color: var(--text-light);
+        transition: all 0.3s ease;
+    }
+
+        .form-control:focus {
+            background-color: var(--input-bg);
+            color: var(--text-light);
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 0 0.25rem rgba(255, 215, 0, 0.25);
+        }
+
+    .btn-register {
+        background-color: var(--accent-gold);
+        border: none;
+        color: var(--primary-dark);
+        font-weight: 600;
+        padding: 0.75rem;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+    }
+
+        .btn-register:hover {
+            background-color: transparent;
+            color: var(--accent-gold);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+            border: 2px solid var(--accent-gold);
+        }
+
+    .text-danger {
+        color: #ff6b6b !important;
+    }
+
+    .provider-icon {
+        font-size: 1.5rem;
+    }
+</style>
+
+<div class="external-login-container">
+    <h1>@ViewData["Title"]</h1>
+    <h2 id="external-login-title">Associe sua conta <span class="provider-badge"><span class="provider-icon">🔗</span> @Model.ProviderDisplayName</span></h2>
+    <hr />
+
+    <p id="external-login-description" class="text-info">
+        Você autenticou com sucesso usando <strong>@Model.ProviderDisplayName</strong>.
+        Por favor, insira um endereço de email para este site abaixo e clique no botão Registrar para concluir
+        o login.
+    </p>
+
+    <form asp-page-handler="Confirmation" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+        <div class="form-floating mb-3">
+            <input asp-for="Input.Email" class="form-control" autocomplete="email" placeholder="Por favor, insira seu email." />
+            <label asp-for="Input.Email">Email</label>
+            <span asp-validation-for="Input.Email" class="text-danger"></span>
+        </div>
+        <button type="submit" class="w-100 btn btn-lg btn-register">Registrar</button>
+    </form>
 </div>
 
 @section Scripts {
