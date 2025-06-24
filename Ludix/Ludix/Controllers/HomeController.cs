@@ -22,18 +22,17 @@ namespace Ludix.Controllers
 
         public async Task<IActionResult> Index()
         {
-            // Buscar jogos em destaque (por exemplo, os mais bem avaliados ou mais recentes)
+            
             var featuredGames = await _context.Game
                 .Include(g => g.Reviews)
                 .Include(g => g.Developer)
                 .Include(g => g.Genres)
-                .Where(g => g.Reviews.Any()) // Apenas jogos com reviews
                 .OrderByDescending(g => g.Reviews.Average(r => r.Rating))
                 .ThenByDescending(g => g.Reviews.Count)
-                .Take(6) // Mostrar 6 jogos em destaque
+                .Take(6) 
                 .ToListAsync();
 
-            // Se não houver jogos com reviews, pegar os mais recentes
+            // Se nao houver jogos com reviews os mais recentes
             if (!featuredGames.Any())
             {
                 featuredGames = await _context.Game
