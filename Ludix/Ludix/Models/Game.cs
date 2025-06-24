@@ -53,7 +53,7 @@ public class Game
     public string Cover { get; set; } = string.Empty;
 
     /***************************
-     * Definição de relacionamentos
+     * Definicao de relacionamentos
     ***************************/
 
     // Relacionamentos 1-N

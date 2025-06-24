@@ -39,7 +39,7 @@ namespace Ludix.Models
         public DateTime ReviewDate { get; set; }
 
         /****************************
-         * Definição de relacionamentos
+         * Definicao de relacionamentos
          ***************************/
 
         // Relacionamentos 1-N

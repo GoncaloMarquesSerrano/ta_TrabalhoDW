@@ -22,7 +22,7 @@ namespace Ludix.Models
         public string GenreName { get; set; } = string.Empty;
 
         /*****************************
-         * Definição de relacionamentos
+         * Definicao de relacionamentos
          ***************************/
 
         // Relacionamentos M-N

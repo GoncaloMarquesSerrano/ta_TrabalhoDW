@@ -31,7 +31,7 @@ namespace Ludix.Models
         public decimal PricePaid { get; set; }
 
         /****************************** 
-         * Definição de relacionamentos
+         * Definicao de relacionamentos
          *****************************/
 
         /// <summary>
