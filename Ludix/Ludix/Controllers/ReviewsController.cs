@@ -246,7 +246,7 @@ namespace Ludix.Controllers
                 return NotFound();
             }
 
-            // Verificar se o utilizador atual é o dono da review ou admin
+            // Verificar se o utilizador atual  o dono da review ou admin
             var currentUser = await GetCurrentUserAsync();
             if (currentUser == null || (review.UserId != currentUser.UserId && !currentUser.IsAdmin))
             {
@@ -267,7 +267,7 @@ namespace Ludix.Controllers
                 return NotFound();
             }
 
-            // Verificar se o utilizador atual é o dono da review ou admin
+            // Verificar se o utilizador atual e o dono da review ou admin
             var currentUser = await GetCurrentUserAsync();
             if (currentUser == null || (review.UserId != currentUser.UserId && !currentUser.IsAdmin))
             {

@@ -169,43 +169,9 @@
                                         {
                                             <p class="card-text">@review.ReviewText</p>
                                         }
-
-                                        @if (User.Identity.IsAuthenticated)
-                                        {
-                                                var currentUserId = ViewContext.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                                                bool isReviewOwner = review.MyUser?.AspUser == currentUserId;
-                                                bool canEditReview = isReviewOwner; // Apenas o dono da review pode editar
-                                            @if (canEditReview)
-                                            {
-                                                <div class="review-actions">
-                                                    <a href="@Url.Action("Details", "Reviews", new { id = review.ReviewId })" 
-                                                       class="btn btn-sm btn-outline-primary">Ver detalhes</a>
-                                                    <a href="@Url.Action("Edit", "Reviews", new { id = review.ReviewId })" 
-                                                       class="btn btn-sm btn-outline-secondary">Editar</a>
-                                                    <a href="@Url.Action("Delete", "Reviews", new { id = review.ReviewId })" 
-                                                       class="btn btn-sm btn-outline-danger"
-                                                       onclick="return confirm('Tem a certeza que deseja eliminar esta avaliação?')">Eliminar</a>
-                                                </div>
-                                            }
-                                            else
-                                            {
-                                                <div class="review-actions">
-                                                    <a href="@Url.Action("Details", "Reviews", new { id = review.ReviewId })" 
-                                                       class="btn btn-sm btn-outline-primary">Ver detalhes</a>
-                                                </div>
-                                            }
-                                        }
                                     </div>
                                 </div>
                             }
-                        </div>
-
-                        <!-- Link para ver todas as reviews -->
-                        <div class="text-center mt-3">
-                            <a href="@Url.Action("GameReviews", "Reviews", new { id = Model.GameId })" 
-                               class="btn btn-outline-primary">
-                                Ver todas as avaliações
-                            </a>
                         </div>
                     }
                     else
