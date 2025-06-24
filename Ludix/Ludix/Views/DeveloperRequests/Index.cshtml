@@ -1,0 +1,52 @@
+﻿@* Views/DeveloperRequests/Index.cshtml *@
+@model IEnumerable<Ludix.Models.MyUser>
+@{
+    ViewData["Title"] = "Solicitações de Desenvolvedores";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Message"]
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Não há solicitações por aprovação.</div>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Website</th>
+                <th>Data da Solicitação</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Username</td>
+                    <td>@item.Email</td>
+                    <td>@item.ProposedWebsite</td>
+                    <td>@item.DeveloperRequestDate?.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>
+                        <a asp-action="Approve" asp-route-id="@item.UserId" class="btn btn-success btn-sm">Aprovar</a>
+                        <a asp-action="Reject" asp-route-id="@item.UserId" class="btn btn-danger btn-sm">Rejeitar</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<div>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Voltar</a>
+</div>

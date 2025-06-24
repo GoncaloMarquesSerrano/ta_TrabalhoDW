@@ -1,0 +1,123 @@
+﻿@model Ludix.Models.Game
+@{
+    ViewData["Title"] = "Create";
+}
+<h1>Create</h1>
+<h4>Game</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Price" class="control-label"></label>
+                <input asp-for="Price" class="form-control" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ReleaseDate" class="control-label"></label>
+                <input asp-for="ReleaseDate" class="form-control" type="date" />
+                <span asp-validation-for="ReleaseDate" class="text-danger"></span>
+            </div>
+
+            <!-- Campo de seleção de desenvolvedor - apenas para admins -->
+            @if (ViewBag.AllDevelopers != null)
+            {
+                <div class="form-group">
+                    <label for="selectedDeveloperId" class="control-label">Desenvolvedor *</label>
+                    <select name="selectedDeveloperId" class="form-control" required>
+                        <option value="">Selecione um desenvolvedor</option>
+                        @foreach (var dev in ViewBag.AllDevelopers)
+                        {
+                            <option value="@dev.UserId">@dev.Website</option>
+                        }
+                    </select>
+                    <small class="form-text text-muted">Como administrador, deve selecionar o desenvolvedor responsável pelo jogo.</small>
+                </div>
+            }
+
+            <div class="form-group">
+                <label asp-for="Cover" class="control-label">Capa *</label>
+                <input type="file" accept=".png,.jpeg,.jpg" name="cover" class="form-control" required />
+                <span asp-validation-for="Cover" class="text-danger"></span>
+                <small class="form-text text-muted">Formatos aceites: JPG, PNG</small>
+            </div>
+
+            <div class="form-group mt-3">
+                <label>Géneros</label>
+                <div class="row">
+                    @if (ViewBag.AllGenres != null)
+                    {
+                        @foreach (var genre in ViewBag.AllGenres)
+                        {
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="selectedGenres" value="@genre.GenreId" id="genre_@genre.GenreId" />
+                                    <label class="form-check-label" for="genre_@genre.GenreId">
+                                        @genre.GenreName
+                                    </label>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+                <small class="form-text text-muted">Selecione um ou mais géneros para o jogo.</small>
+            </div>
+
+            <div class="form-group mt-3">
+                <input type="submit" value="Criar Jogo" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Validação adicional no lado do cliente
+        document.querySelector('form').addEventListener('submit', function(e) {
+            var coverInput = document.querySelector('input[name="cover"]');
+            var selectedGenres = document.querySelectorAll('input[name="selectedGenres"]:checked');
+            var developerSelect = document.querySelector('select[name="selectedDeveloperId"]');
+
+            // Verificar se foi selecionada uma capa
+            if (!coverInput.files || coverInput.files.length === 0) {
+                alert('Por favor, selecione uma imagem de capa para o jogo.');
+                e.preventDefault();
+                return false;
+            }
+
+            // Verificar se pelo menos um género foi selecionado
+            if (selectedGenres.length === 0) {
+                alert('Por favor, selecione pelo menos um género para o jogo.');
+                e.preventDefault();
+                return false;
+            }
+
+            // Se existe o campo de desenvolvedor (admin), verificar se foi selecionado
+            if (developerSelect && !developerSelect.value) {
+                alert('Por favor, selecione um desenvolvedor para o jogo.');
+                e.preventDefault();
+                return false;
+            }
+        });
+    </script>
+}

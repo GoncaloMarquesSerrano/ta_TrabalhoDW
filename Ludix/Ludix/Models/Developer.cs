@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ludix.Models
 {
@@ -10,7 +11,25 @@ namespace Ludix.Models
         /// <summary>
         /// Website do desenvolvedor
         /// </summary>
-        public string Website { get; set; }
+        public string? Website { get; set; }
+
+        /// <summary>
+        /// Data de aprovação como desenvolvedor
+        /// </summary>
+        [Display(Name = "Data de aprovação")]
+        public DateTime ApprovalDate { get; set; }
+
+        /// <summary>
+        /// ID do administrador que aprovou
+        /// </summary>
+        [Display(Name = "Aprovado por")]
+        public int ApprovedByUserId { get; set; }
+
+        /// <summary>
+        /// Referência ao administrador que aprovou
+        /// </summary>
+        [ForeignKey("ApprovedByUserId")]
+        public virtual MyUser ApprovedBy { get; set; } = null!;
     }
 }
 

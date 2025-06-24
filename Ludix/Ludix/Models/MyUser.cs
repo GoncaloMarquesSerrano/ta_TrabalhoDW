@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 namespace Ludix.Models
 {
     /// <summary>
@@ -16,7 +17,8 @@ namespace Ludix.Models
         /// Nome do utilizador
         /// </summary>
         [Display(Name = "Nome")]
-        public string Username { get; set; }
+        [Required(ErrorMessage = "O campo {0} é obrigatório.")]
+        public string Username { get; set; } = string.Empty;
 
         /// <summary>
         /// Email do utilizador
@@ -25,16 +27,7 @@ namespace Ludix.Models
         [Required(ErrorMessage = "O campo {0} é obrigatório.")]
         [EmailAddress(ErrorMessage = "O campo {0} não é um endereço de email válido.")]
         [StringLength(50, ErrorMessage = "O campo {0} deve ter no máximo {1} caracteres.")]
-        public string Email { get; set; }
-
-        /// <summary>
-        /// Senha do utilizador
-        /// </summary>
-        [Display(Name = "Senha")]
-        [Required(ErrorMessage = "O campo {0} é obrigatório.")]
-        [StringLength(50, ErrorMessage = "O campo {0} deve ter entre {2} e {1} caracteres.", MinimumLength = 8)]
-        [DataType(DataType.Password)]
-        public string Password { get; set; }
+        public string Email { get; set; } = string.Empty;
 
         /// <summary>
         /// Saldo do utilizador
@@ -52,6 +45,37 @@ namespace Ludix.Models
         [Required(ErrorMessage = "O campo {0} é obrigatório.")]
         [DataType(DataType.Date)]
         public DateTime CreatedAt { get; set; }
+
+
+        /// <summary>
+        /// Nome do utilizador no ASP.NET Identity
+        /// </summary>
+        [Required]
+        public string AspUser { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Indica se o utilizador é administrador
+        /// </summary>
+        [Display(Name = "Administrador")]
+        public bool IsAdmin { get; set; } = false;
+
+        /// <summary>
+        /// Indica se o utilizador solicitou se tornar desenvolvedor
+        /// </summary>
+        [Display(Name = "Solicitou ser desenvolvedor")]
+        public bool RequestedDeveloper { get; set; } = false;
+
+        /// <summary>
+        /// Website proposto para quando se tornar desenvolvedor (se solicitado)
+        /// </summary>
+        [Display(Name = "Website proposto")]
+        public string? ProposedWebsite { get; set; }
+
+        /// <summary>
+        /// Data da solicitação para se tornar desenvolvedor
+        /// </summary>
+        [Display(Name = "Data da solicitação")]
+        public DateTime? DeveloperRequestDate { get; set; }
     }
 }
 

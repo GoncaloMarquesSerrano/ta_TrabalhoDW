@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ludix.Models
@@ -27,7 +28,7 @@ namespace Ludix.Models
         [Display(Name = "Texto da Avaliação")]
         [Required(ErrorMessage = "O campo {0} é obrigatório.")]
         [StringLength(500, ErrorMessage = "O campo {0} deve ter no máximo {1} caracteres.")]
-        public string ReviewText { get; set; }
+        public string ReviewText { get; set; } = string.Empty;
 
         /// <summary>
         /// Data da avaliacao do jogo
@@ -38,21 +39,22 @@ namespace Ludix.Models
         public DateTime ReviewDate { get; set; }
 
         /****************************
-         * Definição de relacionamentos
+         * Definicao de relacionamentos
          ***************************/
 
         // Relacionamentos 1-N
         /// <summary>
         /// FK para referenciar o utilizador que fez a avaliacao
         /// </summary>
-        [ForeignKey(nameof(User))]
+        [ForeignKey(nameof(MyUser))]
         [Display(Name = "Utilizador")]
         public int UserId { get; set; }
         /// <summary>
         /// FK para referenciar o utilizador que fez a avaliacao
         /// </summary>
         [Display(Name = "Utilizador")]
-        public MyUser User { get; set; }
+        [ValidateNever]
+        public MyUser? MyUser { get; set; } = new MyUser();
 
         /// <summary>
         /// FK para referenciar o jogo que foi avaliado
@@ -65,6 +67,7 @@ namespace Ludix.Models
         /// FK para referenciar o jogo que foi avaliado
         /// </summary>
         [Display(Name = "Jogo")]
-        public Game Game { get; set; }
+        [ValidateNever]
+        public Game? Game { get; set; } = new Game();
     }
 }
