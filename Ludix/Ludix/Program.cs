@@ -1,7 +1,8 @@
+using Ludix.Data;
+using Ludix.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Ludix.Data;
-using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<LudixContext>(options =>
@@ -13,15 +14,17 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
    .AddRoles<IdentityRole>()
    .AddEntityFrameworkStores<LudixContext>();
+builder.Services.AddScoped<IUserClaimsPrincipalFactory<IdentityUser>, UserClaimsService>();
 builder.Services.AddControllersWithViews();
+
 
 
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("DeveloperOrAdmin", policy =>
         policy.RequireAssertion(context =>
-            context.User.IsInRole("Admin") ||
-            context.User.HasClaim("IsDeveloper", "true")));
+            context.User.HasClaim("IsAdmin", "True") ||
+            context.User.HasClaim("IsDeveloper", "True")));
 });
 
 

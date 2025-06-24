@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ludix.Models
@@ -52,7 +53,8 @@ namespace Ludix.Models
         /// FK para referenciar o utilizador que fez a avaliacao
         /// </summary>
         [Display(Name = "Utilizador")]
-        public MyUser MyUser { get; set; } = new MyUser();
+        [ValidateNever]
+        public MyUser? MyUser { get; set; } = new MyUser();
 
         /// <summary>
         /// FK para referenciar o jogo que foi avaliado
@@ -65,6 +67,7 @@ namespace Ludix.Models
         /// FK para referenciar o jogo que foi avaliado
         /// </summary>
         [Display(Name = "Jogo")]
-        public Game Game { get; set; } = new Game();
+        [ValidateNever]
+        public Game? Game { get; set; } = new Game();
     }
 }
