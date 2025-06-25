@@ -1,18 +1,8 @@
 ﻿@model Ludix.Models.MyUser
 @{
-    ViewData["Title"] = "Meu Perfil";
-
-    // Verificar se o modelo é nulo
-    if (Model == null)
-    {
-        <div class="alert alert-danger">
-            <h4>Erro ao carregar o perfil</h4>
-            <p>Não foi possível carregar as informações do seu perfil. Por favor, tente novamente.</p>
-            <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Voltar à página inicial</a>
-        </div>
-        return;
-    }
+    ViewData["Title"] = "Perfil";
 }
+
 <style>
     .profile-container {
         background: var(--secondary-dark);

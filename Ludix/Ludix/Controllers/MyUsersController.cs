@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using Ludix.Data;
 using Ludix.Models;
 using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
 
 namespace Ludix.Controllers
 {
