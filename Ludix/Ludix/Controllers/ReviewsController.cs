@@ -28,6 +28,7 @@ namespace Ludix.Controllers
         // GET: Reviews
         public async Task<IActionResult> Index()
         {
+
             var reviews = await _context.Review
                 .Include(r => r.Game)
                 .Include(r => r.MyUser)
@@ -35,6 +36,7 @@ namespace Ludix.Controllers
                 .ToListAsync();
 
             return View(reviews);
+
         }
 
         // GET: Reviews/Details/5
@@ -61,6 +63,7 @@ namespace Ludix.Controllers
         // GET: Reviews/Create
         public async Task<IActionResult> Create(int? gameId)
         {
+
             // Se foi fornecido um gameId, verificar se o jogo existe
             if (gameId.HasValue)
             {
@@ -136,8 +139,10 @@ namespace Ludix.Controllers
                 return RedirectToAction("Details", "Games", new { id = review.GameId });
             }
 
+
             // Reencaminhar com erro, neste caso volta ao jogo
             return RedirectToAction("Details", "Games", new { id = review.GameId });
+
         }
 
 
@@ -225,6 +230,7 @@ namespace Ludix.Controllers
             // Recarregar dados para o formulário
             var game = await _context.Game.FindAsync(review.GameId);
             ViewData["GameTitle"] = game?.Title ?? "Jogo não encontrado";
+
             return View(review);
         }
 

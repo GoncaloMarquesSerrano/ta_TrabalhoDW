@@ -1,62 +1,220 @@
 ﻿@page
 @model LoginModel
-
 @{
-    ViewData["Title"] = "Log in";
+    ViewData["Title"] = "Login";
 }
 
-<h1>@ViewData["Title"]</h1>
-<div class="row">
-    <div class="col-md-4">
-        <section>
-            <form id="account" method="post">
-                <h2>Use a local account to log in.</h2>
-                <hr />
-                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                    <label asp-for="Input.Email" class="form-label">Email</label>
-                    <span asp-validation-for="Input.Email" class="text-danger"></span>
-                </div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
-                    <label asp-for="Input.Password" class="form-label">Password</label>
-                    <span asp-validation-for="Input.Password" class="text-danger"></span>
-                </div>
-                <div class="checkbox mb-3">
-                    <label asp-for="Input.RememberMe" class="form-label">
-                        <input class="form-check-input" asp-for="Input.RememberMe" />
-                        @Html.DisplayNameFor(m => m.Input.RememberMe)
-                    </label>
-                </div>
-                <div>
-                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
-                </div>
-                <div>
-                    <p>
-                        <a id="forgot-password" asp-page="./ForgotPassword">Forgot your password?</a>
-                    </p>
-                    <p>
-                        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
-                    </p>
-                    <p>
-                        <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Resend email confirmation</a>
-                    </p>
-                </div>
-            </form>
-        </section>
-    </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to log in.</h3>
+<style>
+    :root {
+        --primary-dark: #0a192f;
+        --secondary-dark: #172a45;
+        --accent-gold: #FFD700;
+        --text-light: #e6f1ff;
+        --input-bg: #112240;
+        --input-border: #233554;
+    }
+
+    body {
+        background-color: var(--primary-dark);
+        color: var(--text-light);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .login-container {
+        max-width: 500px;
+        margin: 3rem auto;
+        padding: 2rem;
+        background-color: var(--secondary-dark);
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        border: 1px solid rgba(255,215,0,0.1);
+    }
+
+    h1, h2, h3 {
+        color: var(--accent-gold);
+        text-align: center;
+    }
+
+    h1 {
+        font-size: 2.2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    h3 {
+        font-size: 1.3rem;
+        margin: 1.5rem 0;
+    }
+
+    hr {
+        border-color: rgba(255,215,0,0.2);
+        margin: 1.5rem 0;
+    }
+
+    .form-floating label {
+        color: #8892b0;
+    }
+
+    .form-control {
+        background-color: var(--input-bg);
+        border: 1px solid var(--input-border);
+        color: var(--text-light);
+        transition: all 0.3s ease;
+    }
+
+        .form-control:focus {
+            background-color: var(--input-bg);
+            color: var(--text-light);
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 0 0.25rem rgba(255, 215, 0, 0.25);
+        }
+
+    .btn-login {
+        background-color: var(--accent-gold);
+        border: none;
+        color: var(--primary-dark);
+        font-weight: 600;
+        padding: 0.75rem;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+    }
+
+        .btn-login:hover {
+            background-color: transparent;
+            color: var(--accent-gold);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+            border: 2px solid var(--accent-gold);
+        }
+
+    .text-danger {
+        color: #ff6b6b !important;
+    }
+
+    .form-check-input:checked {
+        background-color: var(--accent-gold);
+        border-color: var(--accent-gold);
+    }
+
+    .form-check-label {
+        color: var(--text-light);
+    }
+
+    .login-links {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin: 1.5rem 0;
+    }
+
+        .login-links a {
+            color: var(--accent-gold);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+            .login-links a:hover {
+                text-decoration: underline;
+            }
+
+    .divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        color: var(--accent-gold);
+        margin: 2rem 0;
+    }
+
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid rgba(255,215,0,0.3);
+        }
+
+        .divider::before {
+            margin-right: 1rem;
+        }
+
+        .divider::after {
+            margin-left: 1rem;
+        }
+
+    .external-login-btn {
+        background-color: transparent;
+        border: 1px solid var(--accent-gold);
+        color: var(--accent-gold);
+        transition: all 0.3s ease;
+        margin: 0.5rem 0;
+        width: 100%;
+        padding: 0.75rem;
+        border-radius: 30px;
+    }
+
+        .external-login-btn:hover {
+            background-color: var(--accent-gold);
+            color: var(--primary-dark);
+        }
+
+    .external-logins-container {
+        margin-top: 1.5rem;
+    }
+</style>
+
+<div class="login-container">
+    <h1>@ViewData["Title"]</h1>
+    
+    <section>
+        <form id="account" method="post">
+            <h2>Acesse sua conta</h2>
             <hr />
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+            
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                <label asp-for="Input.Email">Email</label>
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+            
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
+                <label asp-for="Input.Password">Senha</label>
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+            
+            <div class="checkbox mb-3">
+                <label asp-for="Input.RememberMe" class="form-label">
+                    <input class="form-check-input" asp-for="Input.RememberMe" />
+                    @Html.DisplayNameFor(m => m.Input.RememberMe)
+                </label>
+            </div>
+            
+            <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-login">Entrar</button>
+            
+            <div class="login-links">
+                <a id="forgot-password" asp-page="./ForgotPassword">Esqueceu sua senha?</a>
+                <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Registrar novo usuário</a>
+                <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Reenviar confirmação por email</a>
+            </div>
+        </form>
+
+        <div class="divider">OU</div>
+        
+        <h3>Acesse com outro serviço</h3>
+        
+        <div class="external-logins-container">
             @{
                 if ((Model.ExternalLogins?.Count ?? 0) == 0)
                 {
-                    <div>
+                    <div class="text-center">
                         <p>
-                            There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article
-                            about setting up this ASP.NET application to support logging in via external services</a>.
+                            Não há serviços de autenticação externos configurados. Consulte este 
+                            <a href="https://go.microsoft.com/fwlink/?LinkID=532715" style="color: var(--accent-gold);">artigo</a>.
                         </p>
                     </div>
                 }
@@ -64,18 +222,18 @@
                 {
                     <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
                         <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins!)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                }
-                            </p>
+                            @foreach (var provider in Model.ExternalLogins!)
+                            {
+                                <button type="submit" class="btn external-login-btn" name="provider" value="@provider.Name" title="Acesse com sua conta @provider.DisplayName">
+                                    @provider.DisplayName
+                                </button>
+                            }
                         </div>
                     </form>
                 }
             }
-        </section>
-    </div>
+        </div>
+    </section>
 </div>
 
 @section Scripts {

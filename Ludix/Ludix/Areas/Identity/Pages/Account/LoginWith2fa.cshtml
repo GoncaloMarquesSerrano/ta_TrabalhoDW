@@ -4,35 +4,187 @@
     ViewData["Title"] = "Two-factor authentication";
 }
 
-<h1>@ViewData["Title"]</h1>
-<hr />
-<p>Your login is protected with an authenticator app. Enter your authenticator code below.</p>
-<div class="row">
-    <div class="col-md-4">
-        <form method="post" asp-route-returnUrl="@Model.ReturnUrl">
-            <input asp-for="RememberMe" type="hidden" />
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.TwoFactorCode" class="form-control" autocomplete="off" />
-                <label asp-for="Input.TwoFactorCode" class="form-label"></label>
-                <span asp-validation-for="Input.TwoFactorCode" class="text-danger"></span>
-            </div>
-            <div class="checkbox mb-3">
-                <label asp-for="Input.RememberMachine" class="form-label">
-                    <input asp-for="Input.RememberMachine" />
-                    @Html.DisplayNameFor(m => m.Input.RememberMachine)
-                </label>
-            </div>
-            <div>
-                <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
-            </div>
-        </form>
-    </div>
+<style>
+    :root {
+        --primary-dark: #0a192f;
+        --secondary-dark: #172a45;
+        --accent-gold: #FFD700;
+        --text-light: #e6f1ff;
+        --input-bg: #112240;
+        --input-border: #233554;
+        --danger-red: #ff6b6b;
+        --success-green: #4CAF50;
+    }
+
+    body {
+        background-color: var(--primary-dark);
+        color: var(--text-light);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 1rem;
+    }
+
+    .auth-container {
+        background-color: var(--secondary-dark);
+        border-radius: 10px;
+        padding: 3rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        border: 1px solid rgba(255,215,0,0.1);
+        max-width: 500px;
+        width: 100%;
+    }
+
+    h1 {
+        color: var(--accent-gold);
+        font-size: 2.2rem;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+
+    hr {
+        border-color: rgba(255,215,0,0.2);
+        margin: 1.5rem 0;
+    }
+
+    p {
+        color: var(--text-light);
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .form-floating label {
+        color: #8892b0;
+    }
+
+    .form-control {
+        background-color: var(--input-bg);
+        border: 1px solid var(--input-border);
+        color: var(--text-light);
+        transition: all 0.3s ease;
+    }
+
+        .form-control:focus {
+            background-color: var(--input-bg);
+            color: var(--text-light);
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 0 0.25rem rgba(255, 215, 0, 0.25);
+        }
+
+    .checkbox {
+        margin: 1.5rem 0;
+    }
+
+        .checkbox label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-light);
+            cursor: pointer;
+        }
+
+        .checkbox input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-gold);
+        }
+
+    .btn-login {
+        background-color: var(--accent-gold);
+        border: none;
+        color: var(--primary-dark);
+        font-weight: 600;
+        padding: 0.75rem;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        width: 100%;
+    }
+
+        .btn-login:hover {
+            background-color: transparent;
+            color: var(--accent-gold);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+            border: 2px solid var(--accent-gold);
+        }
+
+    .recovery-link {
+        color: var(--accent-gold);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-block;
+        margin-top: 1.5rem;
+        text-align: center;
+        width: 100%;
+    }
+
+        .recovery-link:hover {
+            color: var(--text-light);
+            text-decoration: underline;
+        }
+
+    .text-danger {
+        color: var(--danger-red) !important;
+    }
+
+    .validation-summary-errors {
+        background-color: rgba(255, 107, 107, 0.1);
+        border-left: 4px solid var(--danger-red);
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        border-radius: 0 4px 4px 0;
+    }
+
+    @@media (max-width: 768px) {
+        .auth-container {
+            padding: 2rem;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+        }
+    }
+</style>
+
+<div class="auth-container">
+    <h1>@ViewData["Title"]</h1>
+    <hr />
+    <p>Your login is protected with an authenticator app. Enter your authenticator code below.</p>
+
+    <form method="post" asp-route-returnUrl="@Model.ReturnUrl">
+        <input asp-for="RememberMe" type="hidden" />
+        <div asp-validation-summary="ModelOnly" class="validation-summary-errors" role="alert"></div>
+
+        <div class="form-floating mb-3">
+            <input asp-for="Input.TwoFactorCode" class="form-control" autocomplete="off" placeholder="Enter authenticator code" />
+            <label asp-for="Input.TwoFactorCode">Authenticator Code</label>
+            <span asp-validation-for="Input.TwoFactorCode" class="text-danger"></span>
+        </div>
+
+        <div class="checkbox mb-3">
+            <label asp-for="Input.RememberMachine" class="form-label">
+                <input asp-for="Input.RememberMachine" />
+                @Html.DisplayNameFor(m => m.Input.RememberMachine)
+            </label>
+        </div>
+
+        <div>
+            <button type="submit" class="btn-login">Log in</button>
+        </div>
+    </form>
+
+    <a id="recovery-code-login"
+       asp-page="./LoginWithRecoveryCode"
+       asp-route-returnUrl="@Model.ReturnUrl"
+       class="recovery-link">
+        Don't have access to your authenticator device? Log in with a recovery code
+    </a>
 </div>
-<p>
-    Don't have access to your authenticator device? You can
-    <a id="recovery-code-login" asp-page="./LoginWithRecoveryCode" asp-route-returnUrl="@Model.ReturnUrl">log in with a recovery code</a>.
-</p>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
