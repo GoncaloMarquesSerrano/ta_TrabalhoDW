@@ -59,7 +59,7 @@ namespace Ludix.Controllers
             return View(games);
         }
 
-        public IActionResult Profile()
+        public IActionResult Wishlist()
         {
             return View();
         }
