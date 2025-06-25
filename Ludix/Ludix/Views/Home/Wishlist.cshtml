@@ -1,0 +1,173 @@
+﻿@model IEnumerable<Ludix.Models.WishlistItem>
+@{
+    ViewData["Title"] = "Wishlist";
+}
+
+<style>
+    .wishlist-container {
+        background: var(--secondary-dark);
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        margin-top: 2rem;
+        border: 1px solid rgba(255,215,0,0.1);
+    }
+
+    .wishlist-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid rgba(255,215,0,0.2);
+    }
+
+    .wishlist-title {
+        color: var(--accent-gold);
+        margin: 0;
+    }
+
+    .wishlist-count {
+        background-color: var(--accent-gold);
+        color: var(--primary-dark);
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-weight: 700;
+    }
+
+    .wishlist-item {
+        display: flex;
+        align-items: center;
+        padding: 1.5rem;
+        background: rgba(10, 25, 47, 0.5);
+        border-radius: 10px;
+        margin-bottom: 1rem;
+        border-left: 3px solid var(--accent-gold);
+        transition: all 0.3s ease;
+    }
+
+        .wishlist-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+    .wishlist-game-cover {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-right: 1.5rem;
+    }
+
+    .wishlist-game-info {
+        flex-grow: 1;
+    }
+
+    .wishlist-game-title {
+        color: var(--accent-gold);
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+
+    .wishlist-game-price {
+        color: var(--text-light);
+        font-size: 1.2rem;
+        font-weight: 700;
+    }
+
+    .wishlist-added-date {
+        color: #a8b2d1;
+        font-size: 0.9rem;
+    }
+
+    .wishlist-actions {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .btn-wishlist-action {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-buy {
+        background-color: var(--accent-gold);
+        color: var(--primary-dark);
+        border: none;
+    }
+
+        .btn-buy:hover {
+            background-color: var(--primary-dark);
+            color: var(--accent-gold);
+            border: 1px solid var(--accent-gold);
+        }
+
+    .btn-remove {
+        background-color: transparent;
+        color: #ff6b6b;
+        border: 1px solid #ff6b6b;
+    }
+
+        .btn-remove:hover {
+            background-color: #ff6b6b;
+            color: var(--text-light);
+        }
+
+    .empty-wishlist {
+        text-align: center;
+        padding: 3rem;
+        color: #a8b2d1;
+    }
+
+    .empty-wishlist-icon {
+        font-size: 3rem;
+        color: var(--accent-gold);
+        margin-bottom: 1rem;
+    }
+</style>
+
+<div class="container">
+    <div class="wishlist-container">
+        <div class="wishlist-header">
+            <h1 class="wishlist-title">Minha Wishlist</h1>
+            <span class="wishlist-count">@Model.Count() itens</span>
+        </div>
+
+        @if (Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <div class="wishlist-item">
+                    <img src="@item.Game.CoverImageUrl" alt="@item.Game.Name" class="wishlist-game-cover">
+                    <div class="wishlist-game-info">
+                        <h3 class="wishlist-game-title">@item.Game.Name</h3>
+                        <div class="wishlist-game-price">@item.Game.Price.ToString("C")</div>
+                        <div class="wishlist-added-date">Adicionado em: @item.AddedDate.ToString("dd/MM/yyyy")</div>
+                    </div>
+                    <div class="wishlist-actions">
+                        <a href="#" class="btn-wishlist-action btn-buy">Comprar Agora</a>
+                        <form asp-action="Remove" method="post">
+                            <input type="hidden" name="id" value="@item.WishlistItemId" />
+                            <button type="submit" class="btn-wishlist-action btn-remove">Remover</button>
+                        </form>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="empty-wishlist">
+                <div class="empty-wishlist-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <h3>Sua wishlist está vazia</h3>
+                <p>Adicione jogos à sua wishlist para acompanhar seus desejos</p>
+                <a asp-controller="Games" asp-action="Index" class="btn-wishlist-action btn-buy">Explorar Jogos</a>
+            </div>
+        }
+    </div>
+</div>
