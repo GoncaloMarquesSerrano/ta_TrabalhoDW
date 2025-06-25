@@ -31,7 +31,7 @@ namespace Ludix.Models
         public decimal PricePaid { get; set; }
 
         /****************************** 
-         * Definição de relacionamentos
+         * Definicao de relacionamentos
          *****************************/
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace Ludix.Models
         /// </summary>
         [Display(Name = "Utilizador")]
         [ForeignKey(nameof(MyUser))]
-        public int UserId { get; set; } 
+        public int UserId { get; set; }
 
         /// <summary>
         /// FK para referenciar o utilizador que fez a compra

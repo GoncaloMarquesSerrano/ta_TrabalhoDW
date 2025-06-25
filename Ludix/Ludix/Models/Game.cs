@@ -50,12 +50,10 @@ public class Game
     /// Nome da imagem de capa do jogo no disco rigido
     /// </summary>
     [Display(Name = "Capa")]
-    [Required(ErrorMessage = "O campo {0} é obrigatório.")]
-    [StringLength(50, ErrorMessage = "O campo {0} deve ter no máximo 50 caracteres")]
     public string Cover { get; set; } = string.Empty;
 
     /***************************
-     * Definição de relacionamentos
+     * Definicao de relacionamentos
     ***************************/
 
     // Relacionamentos 1-N
@@ -71,7 +69,7 @@ public class Game
     /// FK para referenciar o desenvolver do jogo
     /// </summary>
     [Display(Name = "Desenvolvedor")]
-    public Developer Developer { get; set; } = new Developer();
+    public Developer? Developer { get; set; }
 
     // Relacionamentos M-N
 

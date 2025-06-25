@@ -1,21 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Ludix.Data;
+﻿using Ludix.Data;
 using Ludix.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System.IO;
 
 namespace Ludix.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "DeveloperOrAdmin")]
     public class GamesController : Controller
     {
         private readonly LudixContext _context;
@@ -33,6 +26,7 @@ namespace Ludix.Controllers
         }
 
         // GET: Games
+
         public async Task<IActionResult> Index()
         {
             var games = await _context.Game
@@ -44,6 +38,7 @@ namespace Ludix.Controllers
         }
 
         // GET: Games/Details/5
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -69,15 +64,23 @@ namespace Ludix.Controllers
         [Authorize]
         public async Task<IActionResult> Create()
         {
-            // Verificar se o utilizador atual é um desenvolvedor
+            // Verificar se o utilizador atual é um desenvolvedor OU admin
+            var currentUser = await GetCurrentUserAsync();
             var currentDeveloper = await GetCurrentDeveloperAsync();
-            if (currentDeveloper == null)
+
+            if (currentDeveloper == null && (currentUser == null || !currentUser.IsAdmin))
             {
                 return RedirectToAction("AccessDenied", "Account", new { area = "Identity" });
             }
 
             // Carregar géneros para a seleção múltipla
             ViewBag.AllGenres = await _context.Genre.ToListAsync();
+
+            // Se é admin, carregar também todos os desenvolvedores para seleção
+            if (currentUser != null && currentUser.IsAdmin)
+            {
+                ViewBag.AllDevelopers = await _context.Developer.ToListAsync();
+            }
 
             return View();
         }
@@ -86,75 +89,118 @@ namespace Ludix.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> Create(Game game, IFormFile coverImage, int[] selectedGenres)
+        public async Task<IActionResult> Create(Game game, IFormFile cover, int[] selectedGenres, int? selectedDeveloperId)
         {
-            // Verificar se o utilizador atual é um desenvolvedor
-            var currentDeveloper = await GetCurrentDeveloperAsync();
-            if (currentDeveloper == null)
+            bool hasError = false;
+            string imageName = "";
+
+            // Verificar imagem
+            if (cover == null)
             {
-                return RedirectToAction("AccessDenied", "Account", new { area = "Identity" });
+                ModelState.AddModelError("", "É necessário fornecer uma capa.");
+                hasError = true;
+            }
+            else if (cover.ContentType != "image/jpeg" && cover.ContentType != "image/png")
+            {
+                ModelState.AddModelError("", "A capa tem de ser uma imagem JPG ou PNG.");
+                hasError = true;
+            }
+            else
+            {
+                // Criar nome único
+                Guid g = Guid.NewGuid();
+                string extension = Path.GetExtension(cover.FileName).ToLowerInvariant();
+                imageName = g.ToString() + extension;
+
+                // Guardar nome na propriedade Cover (coluna da BD)
+                game.Cover = imageName;
             }
 
-            if (ModelState.IsValid)
+            ModelState.Remove("Cover");
+
+            if (ModelState.IsValid && !hasError)
             {
-                // Processar a imagem de capa
-                if (coverImage != null && coverImage.Length > 0)
+                var currentUser = await GetCurrentUserAsync();
+                Developer developer = null;
+
+                // CORREÇÃO: Se é admin e selecionou um desenvolvedor específico
+                if (currentUser != null && currentUser.IsAdmin && selectedDeveloperId.HasValue)
                 {
-                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(coverImage.FileName);
+                    developer = await _context.Developer.FindAsync(selectedDeveloperId.Value);
 
-                    // Caminho para guardar a imagem
-                    string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images", "covers");
-
-                    // Criar diretório se não existir
-                    if (!Directory.Exists(uploadsFolder))
+                    // ADICIONADO: Verificar se o desenvolvedor selecionado existe
+                    if (developer == null)
                     {
-                        Directory.CreateDirectory(uploadsFolder);
+                        ModelState.AddModelError("", "O desenvolvedor selecionado não é válido.");
+                        ViewBag.AllGenres = await _context.Genre.ToListAsync();
+                        ViewBag.AllDevelopers = await _context.Developer.ToListAsync();
+                        return View(game);
                     }
-
-                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await coverImage.CopyToAsync(fileStream);
-                    }
-
-                    // Atualizar o nome do arquivo no modelo
-                    game.Cover = uniqueFileName;
+                }
+                else if (currentUser != null && currentUser.IsAdmin && !selectedDeveloperId.HasValue)
+                {
+                    // ADICIONADO: Se é admin mas não selecionou um desenvolvedor
+                    ModelState.AddModelError("", "Como administrador, deve selecionar um desenvolvedor para o jogo.");
+                    ViewBag.AllGenres = await _context.Genre.ToListAsync();
+                    ViewBag.AllDevelopers = await _context.Developer.ToListAsync();
+                    return View(game);
                 }
                 else
                 {
-                    // Definir uma imagem padrão se nenhuma for fornecida
-                    game.Cover = "default_cover.jpg";
+                    // Procurar utilizador autenticado como desenvolvedor
+                    var username = User.Identity?.Name;
+                    developer = await _context.Developer
+                        .FirstOrDefaultAsync(d => d.Email == username);
                 }
 
-                // Definir o desenvolvedor atual como o criador do jogo
-                game.DeveloperFk = currentDeveloper.UserId;
+                if (developer == null)
+                {
+                    // MELHORADO: Mensagem de erro mais específica
+                    string errorMessage = currentUser != null && currentUser.IsAdmin
+                        ? "Desenvolvedor selecionado não encontrado."
+                        : "A sua conta não está associada a um perfil de desenvolvedor.";
 
-                // Adicionar o jogo à base de dados
+                    ModelState.AddModelError("", errorMessage);
+                    ViewBag.AllGenres = await _context.Genre.ToListAsync();
+                    if (currentUser != null && currentUser.IsAdmin)
+                    {
+                        ViewBag.AllDevelopers = await _context.Developer.ToListAsync();
+                    }
+                    return View(game);
+                }
+
+                // Associar developer
+                game.DeveloperFk = developer.UserId;
+
+                // Associar géneros
+                game.Genres = await _context.Genre
+                    .Where(g => selectedGenres.Contains(g.GenreId))
+                    .ToListAsync();
+
+                // Adicionar e guardar
                 _context.Add(game);
                 await _context.SaveChangesAsync();
 
-                // Associar géneros ao jogo
-                if (selectedGenres != null && selectedGenres.Length > 0)
+                // Guardar ficheiro no servidor
+                string path = Path.Combine(_webHostEnvironment.WebRootPath, "covers");
+                if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+
+                string fullPath = Path.Combine(path, imageName);
+                using (var stream = new FileStream(fullPath, FileMode.Create))
                 {
-                    game.Genres = new List<Genre>();
-                    foreach (var genreId in selectedGenres)
-                    {
-                        var genre = await _context.Genre.FindAsync(genreId);
-                        if (genre != null)
-                        {
-                            game.Genres.Add(genre);
-                        }
-                    }
-                    await _context.SaveChangesAsync();
+                    await cover.CopyToAsync(stream);
                 }
 
-                TempData["Message"] = $"O jogo '{game.Title}' foi adicionado com sucesso.";
                 return RedirectToAction(nameof(Index));
             }
 
-            // Se chegamos aqui algo correu mal
+            // Se houve erro, recarrega géneros e desenvolvedores
             ViewBag.AllGenres = await _context.Genre.ToListAsync();
+            var currentUserForError = await GetCurrentUserAsync();
+            if (currentUserForError != null && currentUserForError.IsAdmin)
+            {
+                ViewBag.AllDevelopers = await _context.Developer.ToListAsync();
+            }
             return View(game);
         }
 
@@ -177,9 +223,12 @@ namespace Ludix.Controllers
                 return NotFound();
             }
 
-            // Verificar se o utilizador atual é o desenvolvedor deste jogo
+            // Verificar se o utilizador atual é o desenvolvedor deste jogo OU admin
+            var currentUser = await GetCurrentUserAsync();
             var currentDeveloper = await GetCurrentDeveloperAsync();
-            if (currentDeveloper == null || game.DeveloperFk != currentDeveloper.UserId)
+
+            if ((currentDeveloper == null || game.DeveloperFk != currentDeveloper.UserId) &&
+                (currentUser == null || !currentUser.IsAdmin))
             {
                 return RedirectToAction("AccessDenied", "Account", new { area = "Identity" });
             }
@@ -188,6 +237,12 @@ namespace Ludix.Controllers
             ViewBag.AllGenres = await _context.Genre.ToListAsync();
             ViewBag.SelectedGenres = game.Genres.Select(g => g.GenreId).ToList();
 
+            // Se é admin, carregar também todos os desenvolvedores para seleção
+            if (currentUser != null && currentUser.IsAdmin)
+            {
+                ViewBag.AllDevelopers = await _context.Developer.ToListAsync();
+            }
+
             return View(game);
         }
 
@@ -195,18 +250,27 @@ namespace Ludix.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> Edit(int id, Game game, IFormFile coverImage, int[] selectedGenres)
+        public async Task<IActionResult> Edit(int id, Game game, IFormFile coverImage, int[] selectedGenres, int? selectedDeveloperId)
         {
             if (id != game.GameId)
             {
                 return NotFound();
             }
 
-            // Verificar se o utilizador atual é o desenvolvedor deste jogo
+            // Verificar se o utilizador atual é o desenvolvedor deste jogo OU admin
+            var currentUser = await GetCurrentUserAsync();
             var currentDeveloper = await GetCurrentDeveloperAsync();
             var originalGame = await _context.Game.FindAsync(id);
 
-            if (currentDeveloper == null || originalGame == null || originalGame.DeveloperFk != currentDeveloper.UserId)
+            if (originalGame == null)
+            {
+                return NotFound();
+            }
+
+            bool isAuthorized = (currentDeveloper != null && originalGame.DeveloperFk == currentDeveloper.UserId) ||
+                               (currentUser != null && currentUser.IsAdmin);
+
+            if (!isAuthorized)
             {
                 return RedirectToAction("AccessDenied", "Account", new { area = "Identity" });
             }
@@ -215,22 +279,20 @@ namespace Ludix.Controllers
             {
                 try
                 {
-                    // Manter o desenvolvedor original
-                    game.DeveloperFk = originalGame.DeveloperFk;
+                    // Se é admin e selecionou um desenvolvedor diferente
+                    if (currentUser != null && currentUser.IsAdmin && selectedDeveloperId.HasValue)
+                    {
+                        game.DeveloperFk = selectedDeveloperId.Value;
+                    }
+                    else
+                    {
+                        // Manter o desenvolvedor original
+                        game.DeveloperFk = originalGame.DeveloperFk;
+                    }
 
                     // Processar a nova imagem se fornecida
                     if (coverImage != null && coverImage.Length > 0)
                     {
-                        // Apagar a imagem antiga se não for a padrão
-                        if (originalGame.Cover != "default_cover.jpg")
-                        {
-                            string oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", "covers", originalGame.Cover);
-                            if (System.IO.File.Exists(oldImagePath))
-                            {
-                                System.IO.File.Delete(oldImagePath);
-                            }
-                        }
-
                         // Guardar a nova imagem
                         string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(coverImage.FileName);
                         string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images", "covers");
@@ -299,7 +361,11 @@ namespace Ludix.Controllers
 
             // Se chegamos aqui algo correu mal
             ViewBag.AllGenres = await _context.Genre.ToListAsync();
-            ViewBag.SelectedGenres = selectedGenres ?? new int[0];
+            ViewBag.SelectedGenres = selectedGenres ?? Array.Empty<int>();
+            if (currentUser != null && currentUser.IsAdmin)
+            {
+                ViewBag.AllDevelopers = await _context.Developer.ToListAsync();
+            }
             return View(game);
         }
 
@@ -321,9 +387,12 @@ namespace Ludix.Controllers
                 return NotFound();
             }
 
-            // Verificar se o utilizador atual é o desenvolvedor deste jogo
+            // Verificar se o utilizador atual é o desenvolvedor deste jogo OU admin
+            var currentUser = await GetCurrentUserAsync();
             var currentDeveloper = await GetCurrentDeveloperAsync();
-            if (currentDeveloper == null || game.DeveloperFk != currentDeveloper.UserId)
+
+            if ((currentDeveloper == null || game.DeveloperFk != currentDeveloper.UserId) &&
+                (currentUser == null || !currentUser.IsAdmin))
             {
                 return RedirectToAction("AccessDenied", "Account", new { area = "Identity" });
             }
@@ -332,10 +401,10 @@ namespace Ludix.Controllers
         }
 
         // POST: Games/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             var game = await _context.Game.FindAsync(id);
 
@@ -344,37 +413,108 @@ namespace Ludix.Controllers
                 return NotFound();
             }
 
-            // Verificar se o utilizador atual é o desenvolvedor deste jogo
+            // Verificar se o utilizador atual é o desenvolvedor deste jogo OU admin
+            var currentUser = await GetCurrentUserAsync();
             var currentDeveloper = await GetCurrentDeveloperAsync();
-            if (currentDeveloper == null || game.DeveloperFk != currentDeveloper.UserId)
+
+            bool isAdmin = currentUser != null && currentUser.IsAdmin;
+            bool isGameOwner = currentDeveloper != null && game.DeveloperFk == currentDeveloper.UserId;
+
+            if (!isAdmin && !isGameOwner)
             {
                 return RedirectToAction("AccessDenied", "Account", new { area = "Identity" });
             }
 
-            // Verificar se existem compras ou avaliações para este jogo
-            bool hasRelatedData = await _context.Purchase.AnyAsync(p => p.GameId == id) ||
-                                  await _context.Review.AnyAsync(r => r.GameId == id);
+            // Guardar o nome da imagem antes de fazer qualquer operação na BD
+            string imageToDelete = game.Cover;
 
-            if (hasRelatedData)
+            // Tanto admins quanto developers podem apagar jogos com dependências
+            // Admins podem apagar qualquer jogo, developers apenas os seus próprios
+            try
             {
-                TempData["Error"] = "Não é possível excluir este jogo porque existem compras ou avaliações associadas a ele.";
+                // Remover todas as compras relacionadas
+                var purchases = await _context.Purchase.Where(p => p.GameId == id).ToListAsync();
+                if (purchases.Any())
+                {
+                    _context.Purchase.RemoveRange(purchases);
+                }
+
+                // Remover todas as avaliações relacionadas
+                var reviews = await _context.Review.Where(r => r.GameId == id).ToListAsync();
+                if (reviews.Any())
+                {
+                    _context.Review.RemoveRange(reviews);
+                }
+
+                // Remover associações com géneros (many-to-many)
+                var gameWithGenres = await _context.Game
+                    .Include(g => g.Genres)
+                    .FirstOrDefaultAsync(g => g.GameId == id);
+
+                if (gameWithGenres != null)
+                {
+                    gameWithGenres.Genres.Clear();
+                }
+
+                // Apagar a imagem de capa ANTES de remover o jogo da BD
+                if (!string.IsNullOrEmpty(imageToDelete) && imageToDelete != "default_cover.jpg")
+                {
+                    // Tentar primeiro no diretório "covers"
+                    string imagePath1 = Path.Combine(_webHostEnvironment.WebRootPath, "covers", imageToDelete);
+                    // Tentar também no diretório "images/covers"
+                    string imagePath2 = Path.Combine(_webHostEnvironment.WebRootPath, "images", "covers", imageToDelete);
+
+                    if (System.IO.File.Exists(imagePath1))
+                    {
+                        try
+                        {
+                            System.IO.File.Delete(imagePath1);
+                            Console.WriteLine($"Imagem apagada com sucesso: {imagePath1}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Erro ao apagar imagem em {imagePath1}: {ex.Message}");
+                        }
+                    }
+                    else if (System.IO.File.Exists(imagePath2))
+                    {
+                        try
+                        {
+                            System.IO.File.Delete(imagePath2);
+                            Console.WriteLine($"Imagem apagada com sucesso: {imagePath2}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Erro ao apagar imagem em {imagePath2}: {ex.Message}");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Imagem não encontrada em nenhum dos caminhos: {imagePath1} ou {imagePath2}");
+                    }
+                }
+
+                // Remover o registo do jogo da base de dados
+                _context.Game.Remove(game);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Erro ao remover o jogo: {ex.Message}";
                 return RedirectToAction(nameof(Index));
             }
 
-            // Apagar a imagem de capa se não for a padrão
-            if (game.Cover != "default_cover.jpg")
+            string removalNote = "";
+            if (isAdmin)
             {
-                string imagePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", "covers", game.Cover);
-                if (System.IO.File.Exists(imagePath))
-                {
-                    System.IO.File.Delete(imagePath);
-                }
+                removalNote = " (remoção administrativa - todas as dependências foram removidas)";
+            }
+            else if (isGameOwner)
+            {
+                removalNote = " (todas as compras e avaliações relacionadas foram removidas)";
             }
 
-            _context.Game.Remove(game);
-            await _context.SaveChangesAsync();
-
-            TempData["Message"] = $"O jogo '{game.Title}' foi excluído com sucesso.";
+            TempData["Message"] = $"O jogo '{game.Title}' foi excluído com sucesso{removalNote}.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -416,6 +556,21 @@ namespace Ludix.Controllers
             // Verificar se é um desenvolvedor
             return await _context.Developer
                 .FirstOrDefaultAsync(d => d.AspUser == user.Id);
+        }
+
+        // Novo método para obter o utilizador atual da tabela MyUser
+        private async Task<MyUser> GetCurrentUserAsync()
+        {
+            // Obter o utilizador atual do Identity
+            var identityUser = await _userManager.GetUserAsync(User);
+            if (identityUser == null)
+            {
+                return null;
+            }
+
+            // Buscar o utilizador na tabela MyUser
+            return await _context.MyUser
+                .FirstOrDefaultAsync(u => u.AspUser == identityUser.Id);
         }
     }
 }
