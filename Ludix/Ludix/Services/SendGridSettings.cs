@@ -11,7 +11,7 @@
         /// </summary>
         public string FromEmail { get; set; } = string.Empty;
         /// <summary>
-        /// Email do destinatario
+        /// Nome do remetente
         /// </summary>
         public string FromName { get; set; } = string.Empty;
     }
