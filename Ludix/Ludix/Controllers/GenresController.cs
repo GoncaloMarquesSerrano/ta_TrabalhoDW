@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Ludix.Data;
 using Ludix.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Ludix.Controllers
 {
+    [Authorize(Policy = "DeveloperOrAdmin")]
     public class GenresController : Controller
     {
         private readonly LudixContext _context;

@@ -1,9 +1,11 @@
-using System.Diagnostics;
-using Ludix.Models;
 using Ludix.Data;
+using Ludix.Models;
+using Ludix.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
+using System.Diagnostics;
 
 namespace Ludix.Controllers
 {
@@ -45,6 +47,18 @@ namespace Ludix.Controllers
             }
 
             return View(featuredGames);
+        }
+
+        public IActionResult TestConfig([FromServices] IOptions<SendGridSettings> settings)
+        {
+            var config = settings.Value;
+            return Json(new
+            {
+                HasApiKey = !string.IsNullOrEmpty(config.ApiKey),
+                ApiKeyLength = config.ApiKey?.Length ?? 0,
+                FromEmail = config.FromEmail,
+                FromName = config.FromName
+            });
         }
 
         public async Task<IActionResult> Gaymes()

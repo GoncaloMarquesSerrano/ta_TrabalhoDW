@@ -1,6 +1,7 @@
 using Ludix.Data;
 using Ludix.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,7 +16,6 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
    .AddRoles<IdentityRole>()
    .AddEntityFrameworkStores<LudixContext>();
 builder.Services.AddScoped<IUserClaimsPrincipalFactory<IdentityUser>, UserClaimsService>();
-builder.Services.AddControllersWithViews();
 
 
 
@@ -26,6 +26,10 @@ builder.Services.AddAuthorization(options =>
             context.User.HasClaim("IsAdmin", "True") ||
             context.User.HasClaim("IsDeveloper", "True")));
 });
+
+// Configuracao do SendGrid
+builder.Services.Configure<SendGridSettings>(builder.Configuration.GetSection("SendGrid"));
+builder.Services.AddTransient<IEmailSender, SendGridEmailSender>();
 
 
 var app = builder.Build();
@@ -46,7 +50,7 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthentication();
-app.UseAuthorization();
+app.UseAuthorization(); 
 
 app.MapControllerRoute(
     name: "default",
