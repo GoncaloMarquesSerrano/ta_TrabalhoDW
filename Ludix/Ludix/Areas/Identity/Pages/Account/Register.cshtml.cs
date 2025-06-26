@@ -157,8 +157,8 @@ namespace Ludix.Areas.Identity.Pages.Account
                             pageHandler: null,
                             values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                             protocol: Request.Scheme);
-                        await _emailSender.SendEmailAsync(Input.Email, "Confirme seu email",
-                            $"Confirme a sua conta <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>aqui</a>, por favor.");
+                        await _emailSender.SendEmailAsync(Input.Email, "Confirme a sua conta - Sistema Ludix",
+                            GetConfirmationEmailBody(callbackUrl, Input.Email));
 
                         if (Input.RequestDeveloper)
                         {
@@ -208,6 +208,34 @@ namespace Ludix.Areas.Identity.Pages.Account
                 throw new NotSupportedException("The default UI requires a user store with email support.");
             }
             return (IUserEmailStore<IdentityUser>)_userStore;
+        }
+
+        private string GetConfirmationEmailBody(string callbackUrl, string email)
+        {
+            return $@"
+        <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>
+            <h2 style='color: #333;'>Bem-vindo ao Ludix!</h2>
+            <p>Bom dia,</p>
+            <p>Obrigado por se registar no Ludix. Para concluir o seu registo, confirme o seu endereço de email.</p>
+            
+            <div style='text-align: center; margin: 30px 0;'>
+                <a href='{HtmlEncoder.Default.Encode(callbackUrl)}' 
+                   style='background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;'>
+                   Confirmar Email
+                </a>
+            </div>
+            
+            <p>Se não conseguir clicar no botão, copie e cole este link no seu browser:</p>
+            <p style='word-break: break-all; color: #666;'>{HtmlEncoder.Default.Encode(callbackUrl)}</p>
+            
+            <hr style='margin: 30px 0; border: none; border-top: 1px solid #eee;'>
+            <p style='color: #666; font-size: 12px;'>
+                Se não se registou no Ludix, pode ignorar este email.
+            </p>
+            <p style='color: #666; font-size: 12px;'>
+                Equipa Ludix
+            </p>
+        </div>";
         }
     }
 }
