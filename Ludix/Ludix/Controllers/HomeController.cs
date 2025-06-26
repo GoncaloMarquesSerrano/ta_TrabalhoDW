@@ -49,18 +49,6 @@ namespace Ludix.Controllers
             return View(featuredGames);
         }
 
-        public IActionResult TestConfig([FromServices] IOptions<SendGridSettings> settings)
-        {
-            var config = settings.Value;
-            return Json(new
-            {
-                HasApiKey = !string.IsNullOrEmpty(config.ApiKey),
-                ApiKeyLength = config.ApiKey?.Length ?? 0,
-                FromEmail = config.FromEmail,
-                FromName = config.FromName
-            });
-        }
-
         public async Task<IActionResult> Gaymes()
         {
             var games = await _context.Game

@@ -158,7 +158,7 @@ namespace Ludix.Areas.Identity.Pages.Account
                             values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                             protocol: Request.Scheme);
                         await _emailSender.SendEmailAsync(Input.Email, "Confirme seu email",
-                            $"Por favor, confirme a sua conta <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>aqui</a>.");
+                            $"Confirme a sua conta <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>aqui</a>, por favor.");
 
                         if (Input.RequestDeveloper)
                         {
