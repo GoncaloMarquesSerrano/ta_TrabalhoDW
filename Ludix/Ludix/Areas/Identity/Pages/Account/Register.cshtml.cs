@@ -225,7 +225,7 @@ namespace Ludix.Areas.Identity.Pages.Account
                 </a>
             </div>
             
-            <p>Se não conseguir clicar no botão, copie e cole este link no seu browser:</p>
+            <p>Se o botão acima não funcionar, copie e cole este link no seu browser:</p>
             <p style='word-break: break-all; color: #666;'>{HtmlEncoder.Default.Encode(callbackUrl)}</p>
             
             <hr style='margin: 30px 0; border: none; border-top: 1px solid #eee;'>

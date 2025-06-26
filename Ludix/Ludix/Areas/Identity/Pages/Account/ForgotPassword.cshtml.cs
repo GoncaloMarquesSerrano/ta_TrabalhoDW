@@ -70,15 +70,43 @@ namespace Ludix.Areas.Identity.Pages.Account
                     values: new { area = "Identity", code },
                     protocol: Request.Scheme);
 
+                var emailBody = GetForgotPasswordEmailBody(callbackUrl, Input.Email);
                 await _emailSender.SendEmailAsync(
                     Input.Email,
-                    "Reset Password",
-                    $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    "Redefinição de Password - Ludix",
+                    emailBody);
 
                 return RedirectToPage("./ForgotPasswordConfirmation");
             }
 
             return Page();
+        }
+        private string GetForgotPasswordEmailBody(string callbackUrl, string email)
+        {
+            return $@"
+        <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>
+            <h2 style='color: #333;'>Redefinição de password</h2>
+            <p>Bom dia,</p>
+            <p>Recebemos um pedido para redefinir a sua password. Se fez este pedido, clique no botão abaixo:</p>
+            
+            <div style='text-align: center; margin: 30px 0;'>
+                <a href='{HtmlEncoder.Default.Encode(callbackUrl)}' 
+                   style='background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;'>
+                   Redifinir password
+                </a>
+            </div>
+            
+            <p>Se o botão acima não funcionar, copie e cole este link no seu browser:</p>
+            <p style='word-break: break-all; color: #666;'>{HtmlEncoder.Default.Encode(callbackUrl)}</p>
+            
+            <hr style='margin: 30px 0; border: none; border-top: 1px solid #eee;'>
+            <p style='color: #666; font-size: 12px;'>
+                 Se não foi você quem fez este pedido, pode ignorar este email.
+            </p>
+            <p style='color: #666; font-size: 12px;'>
+                Equipa Ludix
+            </p>
+        </div>";
         }
     }
 }
