@@ -1,0 +1,107 @@
+﻿@model Ludix.Models.Game
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@inject UserManager<IdentityUser> UserManager
+@inject Ludix.Data.LudixContext Context
+
+@{
+    var user = await UserManager.GetUserAsync(User);
+    var isInWishlist = false;
+
+    if (user != null)
+    {
+        var myUser = await Context.MyUser
+            .AsQueryable()
+            .FirstOrDefaultAsync(u => u.AspUser == user.Id);
+
+        if (myUser != null)
+        {
+            isInWishlist = await Context.WishlistItems
+                .AsQueryable()
+                .AnyAsync(w => w.GameId == Model.GameId && w.UserId == myUser.UserId);
+        }
+    }
+}
+
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <!-- GameId: @Model.GameId -->
+    <form method="post" asp-controller="Wishlist" asp-action="Toggle" style="display: inline;">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="gameId" value="@Model.GameId" />
+        <input type="hidden" name="returnUrl" value="@ViewContext.HttpContext.Request.Path" />
+
+        <button type="submit" class="wishlist-btn @(isInWishlist ? "in-wishlist" : "")">
+            <i class="@(isInWishlist ? "fas" : "far") fa-heart"></i>
+            <span>@(isInWishlist ? "Remover da wishlist" : "Adicionar à wishlist")</span>
+        </button>
+    </form>
+}
+else
+{
+    <!-- Botão desabilitado para usuários não logados -->
+    <button class="wishlist-btn" disabled title="Faça login para adicionar à wishlist">
+        <i class="far fa-heart"></i>
+        <span>Adicionar à wishlist</span>
+    </button>
+}
+
+<style>
+    .wishlist-btn {
+        background: transparent;
+        border: 2px solid var(--accent-gold);
+        color: var(--accent-gold);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+        .wishlist-btn:hover:not(:disabled) {
+            background: var(--hover-gold);
+            color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 215, 0, 0.3);
+        }
+
+        .wishlist-btn.in-wishlist {
+            background: var(--accent-gold);
+            color: var(--primary-dark);
+        }
+
+            .wishlist-btn.in-wishlist:hover {
+                background: #e6ac00;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(255, 215, 0, 0.4);
+            }
+
+        .wishlist-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            border-color: #666;
+            color: #666;
+        }
+
+            .wishlist-btn:disabled:hover {
+                transform: none;
+                box-shadow: none;
+            }
+
+        .wishlist-btn i {
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .wishlist-btn:active {
+            transform: translateY(0);
+        }
+
+    .wishlist-btn.in-wishlist i {
+        animation: heartBeat 0.6s ease-in-out;
+    }
+</style>

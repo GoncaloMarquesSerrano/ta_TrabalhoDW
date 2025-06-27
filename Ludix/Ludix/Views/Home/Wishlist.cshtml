@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Ludix.Models.WishlistItem>
+﻿@model IEnumerable<Ludix.Models.WishlistItem>?
 @{
     ViewData["Title"] = "Wishlist";
 }
@@ -25,14 +25,19 @@
     .wishlist-title {
         color: var(--accent-gold);
         margin: 0;
+        font-size: 2rem;
+        font-weight: 700;
     }
 
     .wishlist-count {
         background-color: var(--accent-gold);
         color: var(--primary-dark);
-        padding: 0.3rem 0.8rem;
-        border-radius: 20px;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
         font-weight: 700;
+        font-size: 0.9rem;
+        min-width: 60px;
+        text-align: center;
     }
 
     .wishlist-item {
@@ -40,134 +45,271 @@
         align-items: center;
         padding: 1.5rem;
         background: rgba(10, 25, 47, 0.5);
-        border-radius: 10px;
-        margin-bottom: 1rem;
-        border-left: 3px solid var(--accent-gold);
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid var(--accent-gold);
         transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
     }
 
-        .wishlist-item:hover {
-            transform: translateX(5px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        .wishlist-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255,215,0,0.03));
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
+        .wishlist-item:hover {
+            transform: translateX(8px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            border-left-color: #ffd700;
+        }
+
+            .wishlist-item:hover::before {
+                opacity: 1;
+            }
+
     .wishlist-game-cover {
-        width: 100px;
-        height: 100px;
+        width: 120px;
+        height: 120px;
         object-fit: cover;
-        border-radius: 8px;
-        margin-right: 1.5rem;
+        border-radius: 10px;
+        margin-right: 2rem;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        transition: transform 0.3s ease;
+    }
+
+    .wishlist-item:hover .wishlist-game-cover {
+        transform: scale(1.05);
     }
 
     .wishlist-game-info {
         flex-grow: 1;
+        min-width: 0;
     }
 
     .wishlist-game-title {
         color: var(--accent-gold);
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.8rem;
         font-weight: 600;
+        font-size: 1.3rem;
+        line-height: 1.3;
     }
 
     .wishlist-game-price {
         color: var(--text-light);
-        font-size: 1.2rem;
+        font-size: 1.4rem;
         font-weight: 700;
+        margin-bottom: 0.5rem;
     }
 
     .wishlist-added-date {
         color: #a8b2d1;
         font-size: 0.9rem;
+        font-style: italic;
     }
 
     .wishlist-actions {
         display: flex;
-        gap: 1rem;
+        flex-direction: column;
+        gap: 0.8rem;
+        margin-left: 1rem;
     }
 
     .btn-wishlist-action {
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
+        padding: 0.7rem 1.5rem;
+        border-radius: 25px;
         font-weight: 600;
         transition: all 0.3s ease;
         text-decoration: none;
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        cursor: pointer;
+        border: none;
+        min-width: 140px;
     }
 
     .btn-buy {
-        background-color: var(--accent-gold);
+        background: linear-gradient(135deg, var(--accent-gold), #ffd700);
         color: var(--primary-dark);
-        border: none;
+        border: 2px solid transparent;
     }
 
         .btn-buy:hover {
-            background-color: var(--primary-dark);
+            background: var(--primary-dark);
             color: var(--accent-gold);
-            border: 1px solid var(--accent-gold);
+            border-color: var(--accent-gold);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255,215,0,0.3);
         }
 
     .btn-remove {
         background-color: transparent;
         color: #ff6b6b;
-        border: 1px solid #ff6b6b;
+        border: 2px solid #ff6b6b;
     }
 
         .btn-remove:hover {
             background-color: #ff6b6b;
-            color: var(--text-light);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255,107,107,0.3);
         }
 
     .empty-wishlist {
         text-align: center;
-        padding: 3rem;
+        padding: 4rem 2rem;
         color: #a8b2d1;
     }
 
     .empty-wishlist-icon {
-        font-size: 3rem;
+        font-size: 4rem;
+        color: var(--accent-gold);
+        margin-bottom: 1.5rem;
+        animation: pulse 2s infinite;
+    }
+
+    .empty-wishlist h3 {
         color: var(--accent-gold);
         margin-bottom: 1rem;
+        font-size: 1.5rem;
+    }
+
+    .empty-wishlist p {
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+        line-height: 1.5;
+    }
+
+    /* Alert styles */
+    .alert {
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 8px;
+        border: 1px solid transparent;
+    }
+
+    .alert-success {
+        background-color: rgba(40, 167, 69, 0.1);
+        border-color: rgba(40, 167, 69, 0.3);
+        color: #28a745;
+    }
+
+    .alert-danger {
+        background-color: rgba(220, 53, 69, 0.1);
+        border-color: rgba(220, 53, 69, 0.3);
+        color: #dc3545;
+    }
+
+    .alert-info {
+        background-color: rgba(23, 162, 184, 0.1);
+        border-color: rgba(23, 162, 184, 0.3);
+        color: #17a2b8;
     }
 </style>
 
 <div class="container">
+    <!-- Mostrar mensagens do TempData -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+        </div>
+    }
+
+    @if (TempData["InfoMessage"] != null)
+    {
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> @TempData["InfoMessage"]
+        </div>
+    }
+
     <div class="wishlist-container">
         <div class="wishlist-header">
-            <h1 class="wishlist-title">Minha Wishlist</h1>
-            <span class="wishlist-count">@Model.Count() itens</span>
+            <h1 class="wishlist-title">
+                <i class="fas fa-heart" style="margin-right: 0.5rem;"></i>
+                Minha Wishlist
+            </h1>
+            <span class="wishlist-count">
+                @((Model?.Count() ?? 0)) @(Model?.Count() == 1 ? "item" : "itens")
+            </span>
         </div>
 
-        @if (Model.Any())
+        @if (Model != null && Model.Any())
         {
-            foreach (var item in Model)
-            {
-                <div class="wishlist-item">
-                    <img src="@item.Game.CoverImageUrl" alt="@item.Game.Name" class="wishlist-game-cover">
-                    <div class="wishlist-game-info">
-                        <h3 class="wishlist-game-title">@item.Game.Name</h3>
-                        <div class="wishlist-game-price">@item.Game.Price.ToString("C")</div>
-                        <div class="wishlist-added-date">Adicionado em: @item.AddedDate.ToString("dd/MM/yyyy")</div>
+            <div class="wishlist-items">
+                @foreach (var item in Model)
+                {
+                    <div class="wishlist-item">
+                        <img src="@item.Game.CoverImageUrl"
+                             alt="@item.Game.Name"
+                             class="wishlist-game-cover"
+                             onerror="this.src='/images/default-game-cover.jpg'" />
+
+                        <div class="wishlist-game-info">
+                            <h3 class="wishlist-game-title">@item.Game.Name</h3>
+                            <div class="wishlist-game-price">@item.Game.Price.ToString("C")</div>
+                            <div class="wishlist-added-date">
+                                <i class="fas fa-calendar-plus" style="margin-right: 0.3rem;"></i>
+                                Adicionado em: @item.AddedDate.ToString("dd/MM/yyyy")
+                            </div>
+                        </div>
+
+                        <div class="wishlist-actions">
+                            <a href="@Url.Action("Details", "Games", new { id = item.Game.GameId })"
+                               class="btn-wishlist-action btn-buy">
+                                <i class="fas fa-shopping-cart"></i>
+                                Comprar Agora
+                            </a>
+
+                            <!-- Formulário para remover da wishlist -->
+                            <form method="post" asp-controller="Wishlist" asp-action="Remove" style="display: inline;">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@item.WishlistItemId" />
+                                <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+
+                                <button type="submit"
+                                        class="btn-wishlist-action btn-remove"
+                                        onclick="return confirm('Tem certeza que deseja remover @item.Game.Name da sua wishlist?')">
+                                    <i class="fas fa-trash-alt"></i>
+                                    Remover
+                                </button>
+                            </form>
+                        </div>
                     </div>
-                    <div class="wishlist-actions">
-                        <a href="#" class="btn-wishlist-action btn-buy">Comprar Agora</a>
-                        <form asp-action="Remove" method="post">
-                            <input type="hidden" name="id" value="@item.WishlistItemId" />
-                            <button type="submit" class="btn-wishlist-action btn-remove">Remover</button>
-                        </form>
-                    </div>
-                </div>
-            }
+                }
+            </div>
         }
         else
         {
             <div class="empty-wishlist">
                 <div class="empty-wishlist-icon">
-                    <i class="fas fa-heart"></i>
+                    <i class="fas fa-heart-broken"></i>
                 </div>
                 <h3>Sua wishlist está vazia</h3>
-                <p>Adicione jogos à sua wishlist para acompanhar seus desejos</p>
-                <a asp-controller="Games" asp-action="Index" class="btn-wishlist-action btn-buy">Explorar Jogos</a>
+                <p>Adicione jogos à sua wishlist para acompanhar seus desejos e não perder as melhores ofertas!</p>
+                <a asp-controller="Games" asp-action="Index" class="btn-wishlist-action btn-buy">
+                    <i class="fas fa-gamepad"></i>
+                    Explorar Jogos
+                </a>
             </div>
         }
     </div>
 </div>
+

@@ -3,29 +3,208 @@
     ViewData["Title"] = "Details";
 }
 
+<style>
+    /* Estilos base */
+    :root {
+        --primary-dark: #0a192f;
+        --secondary-dark: #172a45;
+        --accent-gold: #FFD700;
+        --text-light: #e6f1ff;
+        --hover-gold: rgba(255, 215, 0, 0.2);
+        --success-green: #28a745;
+        --danger-red: #dc3545;
+        --warning-yellow: #ffc107;
+        --info-blue: #17a2b8;
+    }
+
+    .game-detail-container {
+        background-color: var(--secondary-dark);
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 215, 0, 0.1);
+    }
+
+    .game-header {
+        border-bottom: 2px solid var(--accent-gold);
+        padding-bottom: 15px;
+        margin-bottom: 20px;
+    }
+
+    .game-cover {
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease;
+        max-height: 300px;
+        object-fit: cover;
+    }
+
+        .game-cover:hover {
+            transform: scale(1.02);
+        }
+
+    .game-details dt {
+        color: var(--accent-gold);
+        font-weight: 600;
+    }
+
+    .game-details dd {
+        color: var(--text-light);
+    }
+
+    .genre-badge {
+        background-color: var(--accent-gold);
+        color: var(--primary-dark);
+        font-weight: 600;
+        margin-right: 5px;
+        margin-bottom: 5px;
+    }
+
+    .wishlist-btn {
+        background-color: transparent;
+        border: 2px solid var(--accent-gold);
+        color: var(--accent-gold);
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .wishlist-btn:hover:not(:disabled) {
+            background-color: var(--hover-gold);
+            transform: translateY(-2px);
+        }
+
+        .wishlist-btn.in-wishlist {
+            background-color: var(--accent-gold);
+            color: var(--primary-dark);
+        }
+
+        .wishlist-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            border-color: #666;
+            color: #666;
+        }
+
+    .buy-btn {
+        background-color: var(--success-green);
+        color: white;
+        transition: all 0.3s ease;
+    }
+
+        .buy-btn:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+    .reviews-section {
+        border-top: 1px solid rgba(255, 215, 0, 0.2);
+        margin-top: 30px;
+        padding-top: 20px;
+    }
+
+    .review-card {
+        background-color: rgba(10, 25, 47, 0.5);
+        border-left: 3px solid var(--accent-gold);
+        transition: transform 0.3s ease;
+    }
+
+        .review-card:hover {
+            transform: translateX(5px);
+        }
+
+    .rating-stars {
+        color: var(--accent-gold);
+    }
+
+    .review-form {
+        background-color: rgba(23, 42, 69, 0.8);
+        border: 1px solid var(--accent-gold);
+    }
+
+    .actions-sidebar {
+        position: sticky;
+        top: 20px;
+    }
+
+    .action-card {
+        background-color: var(--secondary-dark);
+        border: 1px solid rgba(255, 215, 0, 0.1);
+    }
+
+    .progress-bar-warning {
+        background-color: var(--accent-gold);
+    }
+
+    .alert-info {
+        background-color: rgba(23, 162, 184, 0.2);
+        border-color: var(--info-blue);
+        color: var(--text-light);
+    }
+
+    @@keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .pulse-animation {
+        animation: pulse 1.5s infinite;
+    }
+</style>
+
 <div class="container mt-4">
     <div class="row">
         <div class="col-lg-8">
-            <div class="card">
-                <div class="card-header">
+            <div class="card game-detail-container">
+                <div class="card-header game-header">
                     <h2>@Model.Title</h2>
                 </div>
                 <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2 mb-4">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <partial name="_WishlistButton" model="Model" />
+                            <a href="#" class="btn buy-btn">
+                                <i class="fas fa-shopping-cart"></i> Comprar (@Model.Price.ToString("C"))
+                            </a>
+                        }
+                        else
+                        {
+                            <div class="alert alert-info w-100">
+                                <i class="fas fa-info-circle"></i>
+                                <a href="@Url.Action("Login", "Account", new { area = "Identity" })">Faça login</a> para adicionar à wishlist ou comprar.
+                            </div>
+                        }
+                    </div>
+
                     <div class="row">
                         <div class="col-md-4">
-                            <img src="~/covers/@Model.Cover" alt="@Model.Title Cover" class="img-fluid rounded" style="max-width: 100%; height: auto;" />
+                            <img src="~/covers/@Model.Cover" alt="@Model.Title Cover" class="img-fluid rounded game-cover" />
                         </div>
                         <div class="col-md-8">
-                            <dl class="row">
+                            <dl class="row game-details">
                                 <dt class="col-sm-4">Preço:</dt>
                                 <dd class="col-sm-8"><strong class="text-success">@Model.Price.ToString("C")</strong></dd>
-                                
+
                                 <dt class="col-sm-4">Data de Lançamento:</dt>
                                 <dd class="col-sm-8">@Model.ReleaseDate.ToString("dd/MM/yyyy")</dd>
-                                
+
                                 <dt class="col-sm-4">Desenvolvedor:</dt>
                                 <dd class="col-sm-8">@(Model.Developer?.Username ?? "N/A")</dd>
-                                
+
                                 <dt class="col-sm-4">Géneros:</dt>
                                 <dd class="col-sm-8">
                                     @if (Model.Genres != null && Model.Genres.Any())
@@ -33,7 +212,7 @@
                                         <div class="d-flex flex-wrap">
                                             @foreach (var genre in Model.Genres)
                                             {
-                                                <span class="badge bg-secondary me-1 mb-1">@genre.GenreName</span>
+                                                <span class="badge genre-badge me-1 mb-1">@genre.GenreName</span>
                                             }
                                         </div>
                                     }
@@ -45,7 +224,7 @@
                             </dl>
                         </div>
                     </div>
-                    
+
                     @if (!string.IsNullOrEmpty(Model.Description))
                     {
                         <div class="mt-3">
@@ -55,7 +234,8 @@
                     }
                 </div>
             </div>
-            <div class="card mt-4">
+
+            <div class="card mt-4 reviews-section">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4 class="mb-0">Avaliações</h4>
                     @if (Model.Reviews != null && Model.Reviews.Any())
@@ -71,12 +251,10 @@
                 <div class="card-body">
                     @if (User.Identity.IsAuthenticated)
                     {
-                        @* Verificar se o utilizador ja fez review para este jogo *@
-                            var userReview = Model.Reviews?.FirstOrDefault(r => r.MyUser?.AspUser == ViewContext.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
+                        var userReview = Model.Reviews?.FirstOrDefault(r => r.MyUser?.AspUser == ViewContext.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
                         @if (userReview == null)
                         {
-                            <!-- Formulario para criar nova review -->
-                            <div class="card border-primary mb-4">
+                            <div class="card border-primary mb-4 review-form">
                                 <div class="card-header bg-primary text-white">
                                     <h6 class="mb-0"><i class="fas fa-star"></i> Avaliar este jogo</h6>
                                 </div>
@@ -103,7 +281,7 @@
 
                                         <div class="mb-3">
                                             <label for="ReviewText" class="form-label">Comentário (opcional)</label>
-                                            <textarea class="form-control" name="ReviewText" id="ReviewText" 
+                                            <textarea class="form-control" name="ReviewText" id="ReviewText"
                                                       rows="4" placeholder="Partilhe a sua opinião sobre este jogo..." maxlength="500"></textarea>
                                             <small class="form-text text-muted">Máximo 500 caracteres</small>
                                         </div>
@@ -119,7 +297,6 @@
                         }
                         else
                         {
-                            <!-- Mostrar que o utilizador ja fez review -->
                             <div class="alert alert-info mb-4">
                                 <i class="fas fa-info-circle"></i>
                                 Já avaliou este jogo. Pode <a href="@Url.Action("Edit", "Reviews", new { id = userReview.ReviewId })" class="alert-link">editar a sua avaliação</a> se desejar.
@@ -136,18 +313,17 @@
 
                     @if (Model.Reviews != null && Model.Reviews.Any())
                     {
-                        <!-- Lista de Reviews -->
                         <div class="reviews-list">
                             @foreach (var review in Model.Reviews.OrderByDescending(r => r.ReviewDate))
                             {
-                                <div class="card mb-3 border-light">
+                                <div class="card mb-3 review-card">
                                     <div class="card-body">
                                         <div class="d-flex justify-content-between align-items-start mb-2">
                                             <div>
                                                 <h6 class="card-title mb-1">
                                                     @(review.MyUser?.Username ?? "Utilizador Anónimo")
                                                 </h6>
-                                                <div class="rating mb-2">
+                                                <div class="rating-stars mb-2">
                                                     @for (int i = 1; i <= 5; i++)
                                                     {
                                                         if (i <= review.Rating)
@@ -164,7 +340,7 @@
                                             </div>
                                             <small class="text-muted">@review.ReviewDate.ToString("dd/MM/yyyy HH:mm")</small>
                                         </div>
-                                        
+
                                         @if (!string.IsNullOrEmpty(review.ReviewText))
                                         {
                                             <p class="card-text">@review.ReviewText</p>
@@ -189,49 +365,38 @@
             </div>
         </div>
 
-        <!-- Sidebar com acoes -->
         <div class="col-lg-4">
-            <div class="card">
+            <div class="card action-card actions-sidebar">
                 <div class="card-header">
                     <h5>Ações</h5>
                 </div>
                 <div class="card-body">
                     @if (User.Identity.IsAuthenticated)
                     {
-                            var currentUserId = ViewContext.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                            // Verificar se o utilizador e o desenvolvedor do jogo
-                            bool isDeveloper = Model.Developer?.AspUser == currentUserId;
-                            // Verificar se o utilizador e admin 
-                            bool isAdmin = ViewBag.IsAdmin != null ? (bool)ViewBag.IsAdmin : false;
-                            
-                            bool canManageGame = isDeveloper || isAdmin;
+                        var currentUserId = ViewContext.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                        bool isDeveloper = Model.Developer?.AspUser == currentUserId;
+                        bool isAdmin = ViewBag.IsAdmin != null ? (bool)ViewBag.IsAdmin : false;
+                        bool canManageGame = isDeveloper || isAdmin;
+
                         @if (canManageGame)
                         {
                             <a asp-action="Edit" asp-route-id="@Model.GameId" class="btn btn-warning btn-block mb-2">
                                 <i class="fas fa-edit"></i> Editar Jogo
                             </a>
-                            
+
                             <a asp-action="Delete" asp-route-id="@Model.GameId" class="btn btn-danger btn-block mb-2"
                                onclick="return confirm('Tem certeza que deseja eliminar este jogo? Esta ação não pode ser desfeita!')">
                                 <i class="fas fa-trash"></i> Eliminar Jogo
                             </a>
                         }
                     }
-                    
+
                     <a asp-controller="Home" asp-action="Index" class="btn btn-secondary btn-block">
                         <i class="fas fa-arrow-left"></i> Voltar à Lista
                     </a>
-                    
-                    @if (User.Identity.IsAuthenticated)
-                    {
-                        <a href="#" class="btn btn-success btn-block mt-2">
-                            <i class="fas fa-shopping-cart"></i> Comprar (@Model.Price.ToString("C"))
-                        </a>
-                    }
                 </div>
             </div>
 
-            <!-- Estatisticas das Reviews -->
             @if (Model.Reviews != null && Model.Reviews.Any())
             {
                 <div class="card mt-3">
@@ -241,21 +406,21 @@
                     <div class="card-body">
                         @{
                             var reviewStats = Model.Reviews.GroupBy(r => r.Rating)
-                                                          .OrderByDescending(g => g.Key)
-                                                          .ToDictionary(g => g.Key, g => g.Count());
+                            .OrderByDescending(g => g.Key)
+                            .ToDictionary(g => g.Key, g => g.Count());
                             var totalReviews = Model.Reviews.Count();
                         }
-                        
+
                         @for (int rating = 5; rating >= 1; rating--)
                         {
                             var count = reviewStats.ContainsKey(rating) ? reviewStats[rating] : 0;
                             var percentage = totalReviews > 0 ? (count * 100.0 / totalReviews) : 0;
-                            
+
                             <div class="d-flex align-items-center mb-1">
                                 <span class="me-2">@rating ★</span>
                                 <div class="progress flex-grow-1 me-2" style="height: 15px;">
-                                    <div class="progress-bar bg-warning" role="progressbar" 
-                                         style="width: @percentage%" 
+                                    <div class="progress-bar progress-bar-warning" role="progressbar"
+                                         style="width: @percentage%"
                                          aria-valuenow="@percentage" aria-valuemin="0" aria-valuemax="100">
                                     </div>
                                 </div>
@@ -272,6 +437,54 @@
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Manipulador do botão de wishlist
+            $('.wishlist-btn').click(async function(e) {
+                e.preventDefault();
+
+                if ($(this).attr('disabled')) return;
+
+                const btn = $(this);
+                const gameId = btn.data('game-id');
+
+                try {
+                    const response = await fetch('/Wishlist/Toggle', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                        },
+                        body: JSON.stringify({ gameId })
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+
+                        if (data.action === 'added') {
+                            btn.addClass('in-wishlist pulse-animation');
+                            btn.find('i').removeClass('far').addClass('fas');
+                            btn.find('span').text('Na wishlist');
+                            setTimeout(() => btn.removeClass('pulse-animation'), 1500);
+                        } else {
+                            btn.removeClass('in-wishlist');
+                            btn.find('i').removeClass('fas').addClass('far');
+                            btn.find('span').text('Adicionar à wishlist');
+                        }
+
+                        // Atualizar contador na navbar
+                        updateWishlistCount();
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            });
+
+            function updateWishlistCount() {
+                $.get('/Wishlist/GetWishlistCount', function(data) {
+                    $('#wishlist-count').text(data.count);
+                });
+            }
+
+            // Outros scripts existentes...
             const deleteButtons = document.querySelectorAll('a[href*="Delete"]');
             deleteButtons.forEach(button => {
                 button.addEventListener('click', function(e) {
@@ -307,7 +520,7 @@
                 function updateCounter() {
                     const remaining = maxLength - reviewTextarea.value.length;
                     counterElement.textContent = `${reviewTextarea.value.length}/${maxLength} caracteres`;
-                    
+
                     if (remaining < 50) {
                         counterElement.classList.remove('text-muted');
                         counterElement.classList.add('text-warning');
@@ -322,8 +535,9 @@
 
                 reviewTextarea.addEventListener('input', updateCounter);
                 reviewTextarea.setAttribute('maxlength', maxLength);
-                updateCounter(); 
+                updateCounter();
             }
+
             const reviewForm = document.querySelector('form[action*="Reviews/Create"]');
             if (reviewForm) {
                 reviewForm.addEventListener('submit', function(e) {
