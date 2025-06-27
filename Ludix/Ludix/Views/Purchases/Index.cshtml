@@ -1,14 +1,11 @@
 ﻿@model IEnumerable<Ludix.Models.Purchase>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Minhas Compras";
 }
 
-<h1>Index</h1>
+<h1>Minhas Compras</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
         <tr>
@@ -16,38 +13,44 @@
                 @Html.DisplayNameFor(model => model.PurchaseDate)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.Game)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.PricePaid)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.MyUser)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Game)
+                @Html.DisplayNameFor(model => model.Status)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.PurchaseDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PricePaid)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MyUser.AspUser)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Game.Description)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.PurchaseId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.PurchaseId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.PurchaseId">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @item.PurchaseDate.ToString("dd/MM/yyyy HH:mm")
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Game.Name)
+                </td>
+                <td>
+                    @item.PricePaid.ToString("C")
+                </td>
+                <td>
+                    <span class="badge bg-@(item.Status == "Concluído" ? "success" : "info")">
+                        @Html.DisplayFor(modelItem => item.Status)
+                    </span>
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.PurchaseId" class="btn btn-sm btn-info">Detalhes</a>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.PurchaseId" class="btn btn-sm btn-warning">Editar</a>
+                        <a asp-action="Delete" asp-route-id="@item.PurchaseId" class="btn btn-sm btn-danger">Excluir</a>
+                    }
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

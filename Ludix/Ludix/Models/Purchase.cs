@@ -1,63 +1,39 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ludix.Models
 {
-    /// <summary>
-    /// Tabela que representa uma compra de um jogo.
-    /// </summary>
     public class Purchase
     {
-        /// <summary>
-        /// Id da compra
-        /// </summary>
         [Key]
         public int PurchaseId { get; set; }
 
-        /// <summary>
-        /// Data da compra
-        /// </summary>
         [Display(Name = "Data da Compra")]
-        [Required(ErrorMessage = "O {0} é de preenchimento obrigatório.")]
-        [DataType(DataType.Date)]
-        public DateTime PurchaseDate { get; set; }
+        public DateTime PurchaseDate { get; set; } = DateTime.Now;
 
-        /// <summary>
-        /// Preco pago pela compra
-        /// </summary>
-        [Display(Name = "Preço pago")]
-        [Required(ErrorMessage = "O {0} é de preenchimento obrigatório.")]
-        [DataType(DataType.Currency)]
+        [Display(Name = "Preço Pago")]
+        [Column(TypeName = "decimal(18,2)")]
         public decimal PricePaid { get; set; }
 
-        /****************************** 
-         * Definicao de relacionamentos
-         *****************************/
+        [Display(Name = "Método de Pagamento")]
+        public string PaymentMethod { get; set; }
 
-        /// <summary>
-        /// FK para referenciar o utilizador que fez a compra
-        /// </summary>
-        [Display(Name = "Utilizador")]
-        [ForeignKey(nameof(MyUser))]
+        [Display(Name = "Status")]
+        public string Status { get; set; } = "Processando";
+
+        // Relacionamento com User (usando int para UserId)
+        [ForeignKey("User")]
         public int UserId { get; set; }
 
-        /// <summary>
-        /// FK para referenciar o utilizador que fez a compra
-        /// </summary>
         [Display(Name = "Utilizador")]
-        public MyUser MyUser { get; set; } = new MyUser();
+        public MyUser User { get; set; }
 
-        /// <summary>
-        /// FK para referenciar o jogo que foi comprado
-        /// </summary>
-        [Display(Name = "Jogo")]
-        [ForeignKey(nameof(Game))]
+        // Relacionamento com Game
+        [ForeignKey("Game")]
         public int GameId { get; set; }
 
-        /// <summary>
-        /// FK para referenciar o jogo que foi comprado
-        /// </summary>
         [Display(Name = "Jogo")]
-        public Game Game { get; set; } = new Game();
+        public Game Game { get; set; }
     }
 }

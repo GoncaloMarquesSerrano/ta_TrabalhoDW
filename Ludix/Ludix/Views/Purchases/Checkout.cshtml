@@ -1,0 +1,100 @@
+﻿@{
+    var game = ViewBag.Game as Ludix.Models.Game;
+    var user = ViewBag.User as Ludix.Models.MyUser;
+    var paymentMethods = ViewBag.PaymentMethods as List<SelectListItem>;
+}
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3>Finalizar Compra</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Checkout" method="post">
+                        <input type="hidden" name="gameId" value="@game.GameId" />
+
+                        <h4>@game.Name</h4>
+                        <p class="h5 text-success">@game.Price.ToString("C")</p>
+                        <hr>
+
+                        <h5 class="mt-4">Método de Pagamento</h5>
+                        <select name="paymentMethod" class="form-select mb-3" required>
+                            <option value="">Selecione...</option>
+                            @foreach (var method in paymentMethods)
+                            {
+                                <option value="@method.Value">@method.Text</option>
+                            }
+                        </select>
+
+                        <div id="creditCardSection" style="display: none;">
+                            <div class="mb-3">
+                                <label class="form-label">Número do Cartão</label>
+                                <input type="text" name="cardNumber" class="form-control" placeholder="1234 5678 9012 3456">
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Nome no Cartão</label>
+                                    <input type="text" name="cardHolder" class="form-control">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Validade (MM/AA)</label>
+                                    <input type="text" name="cardExpiry" class="form-control" placeholder="MM/AA">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">CVV</label>
+                                    <input type="text" name="cardCvv" class="form-control" placeholder="123">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="termsCheck" required>
+                            <label class="form-check-label" for="termsCheck">
+                                Eu li e aceito os <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">termos e condições</a>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-success btn-lg w-100">
+                            Confirmar Compra
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Resumo da Compra</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Produto:</span>
+                        <span>@game.Name</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Preço:</span>
+                        <span>@game.Price.ToString("C")</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between fw-bold">
+                        <span>Total:</span>
+                        <span>@game.Price.ToString("C")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Mostrar/ocultar seção de cartão de crédito
+        document.querySelector('select[name="paymentMethod"]').addEventListener('change', function() {
+            const creditCardSection = document.getElementById('creditCardSection');
+            creditCardSection.style.display = this.value === 'CreditCard' ? 'block' : 'none';
+        });
+    </script>
+}

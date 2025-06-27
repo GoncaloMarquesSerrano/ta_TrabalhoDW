@@ -1,42 +1,71 @@
 ﻿@model Ludix.Models.Purchase
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalhes da Compra";
 }
 
-<h1>Details</h1>
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h1>Detalhes da Compra</h1>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h4>Informações da Compra</h4>
+                <hr />
+                <dl class="row">
+                    <dt class="col-sm-4">
+                        @Html.DisplayNameFor(model => model.PurchaseDate)
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Model.PurchaseDate.ToString("dd/MM/yyyy HH:mm")
+                    </dd>
 
-<div>
-    <h4>Purchase</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PurchaseDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PurchaseDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PricePaid)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PricePaid)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MyUser)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MyUser.AspUser)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Game)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Game.Description)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.PurchaseId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+                    <dt class="col-sm-4">
+                        @Html.DisplayNameFor(model => model.PricePaid)
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Model.PricePaid.ToString("C")
+                    </dd>
+
+                    <dt class="col-sm-4">
+                        @Html.DisplayNameFor(model => model.PaymentMethod)
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.PaymentMethod)
+                    </dd>
+
+                    <dt class="col-sm-4">
+                        @Html.DisplayNameFor(model => model.Status)
+                    </dt>
+                    <dd class="col-sm-8">
+                        <span class="badge bg-@(Model.Status == "Concluído" ? "success" : "info")">
+                            @Html.DisplayFor(model => model.Status)
+                        </span>
+                    </dd>
+                </dl>
+            </div>
+
+            <div class="col-md-6">
+                <h4>Detalhes do Jogo</h4>
+                <hr />
+                <div class="media">
+                    <img src="@Model.Game.Cover" class="mr-3" alt="@Model.Game.Name" style="max-width: 100px;">
+                    <div class="media-body">
+                        <h5 class="mt-0">@Model.Game.Name</h5>
+                        <p>@Model.Game.Description</p>
+                        <p class="text-success">@Model.Game.Price.ToString("C")</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <a asp-action="Index" class="btn btn-secondary">Voltar à lista</a>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Edit" asp-route-id="@Model.PurchaseId" class="btn btn-warning">Editar</a>
+            }
+        </div>
+    </div>
 </div>

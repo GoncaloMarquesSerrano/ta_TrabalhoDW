@@ -77,7 +77,12 @@ namespace Ludix.Models
         [Display(Name = "Data da solicitação")]
         public DateTime? DeveloperRequestDate { get; set; }
 
-        public ICollection<WishlistItem> WishlistItems { get; set; } = [];
+        /// <summary>
+        /// Relacionamento com as compras do usuário
+        /// </summary>
+        public ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();
+
+        public ICollection<WishlistItem> WishlistItems { get; set; } = new List<WishlistItem>();
     }
 }
 
