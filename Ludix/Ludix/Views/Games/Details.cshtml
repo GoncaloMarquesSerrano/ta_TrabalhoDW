@@ -177,7 +177,7 @@
                         @if (User.Identity.IsAuthenticated)
                         {
                             <partial name="_WishlistButton" model="Model" />
-                            <a asp-controller="Purchases" asp-action="Checkout" asp-route-gameId="@Model.GameId" class="btn buy-btn">
+                            <a asp-controller="Purchases" asp-action="Create" asp-route-gameId="@Model.GameId" class="btn buy-btn">
                                 <i class="fas fa-shopping-cart"></i> Comprar (@Model.Price.ToString("C"))
                             </a>
                         }

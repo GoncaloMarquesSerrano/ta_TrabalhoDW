@@ -579,5 +579,132 @@ namespace Ludix.Controllers
             var games = await _context.Game.ToListAsync();
             return View(games); // View = AllGames.cshtml
         }
+
+        [Authorize]
+        public async Task<IActionResult> Checkout(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            // Verificar se o jogo existe
+            var game = await _context.Game.FindAsync(id.Value);
+            if (game == null)
+            {
+                return NotFound("Jogo não encontrado");
+            }
+
+            // Obter o usuário atual
+            var currentUser = await GetCurrentUserAsync();
+            if (currentUser == null)
+            {
+                return RedirectToAction("Login", "Account", new { area = "Identity" });
+            }
+
+            // Verificar se o usuário tem saldo suficiente
+            if (currentUser.Balance < game.Price)
+            {
+                TempData["Error"] = "Saldo insuficiente para realizar a compra";
+                return RedirectToAction("Details", new { id = id.Value });
+            }
+
+            // Verificar se o usuário já possui este jogo
+            var existingPurchase = await _context.Purchase
+                .FirstOrDefaultAsync(p => p.GameId == id.Value && p.UserId == currentUser.UserId);
+
+            if (existingPurchase != null)
+            {
+                TempData["Info"] = "Você já possui este jogo";
+                return RedirectToAction("Details", new { id = id.Value });
+            }
+
+            // Redirecionar para o controller de Purchases
+            return RedirectToAction("Create", "Purchases", new { gameId = id.Value, userId = currentUser.UserId });
+        }
+
+        // Método auxiliar para verificar se o usuário já possui o jogo (útil para a view Details)
+        public async Task<bool> UserOwnsGame(int gameId, int userId)
+        {
+            return await _context.Purchase
+                .AnyAsync(p => p.GameId == gameId && p.UserId == userId);
+        }
+
+        // GET: /Games/AllGames
+        public async Task<IActionResult> AllGames(string searchTerm, string genre, string sortBy = "newest")
+        {
+            try
+            {
+                // DEBUG: Verificar se há jogos na base de dados
+                var totalGamesCount = await _context.Game.CountAsync();
+                ViewBag.DebugTotalGames = totalGamesCount;
+
+                if (totalGamesCount == 0)
+                {
+                    ViewBag.DebugMessage = "Não há jogos na base de dados";
+                    return View(new List<Game>());
+                }
+
+                // Começar com todos os jogos e incluir relacionamentos necessários
+                var query = _context.Game
+                    .Include(g => g.Developer)
+                    .Include(g => g.Genres)
+                    .Include(g => g.Reviews)
+                    .AsQueryable();
+
+                // DEBUG: Verificar quantos jogos foram carregados inicialmente
+                var initialCount = await query.CountAsync();
+                ViewBag.DebugInitialCount = initialCount;
+
+                // Aplicar filtros apenas se especificados
+                if (!string.IsNullOrEmpty(searchTerm))
+                {
+                    query = query.Where(g =>
+                        g.Title.Contains(searchTerm) ||
+                        g.Description.Contains(searchTerm) ||
+                        (g.Developer != null && g.Developer.Username.Contains(searchTerm)));
+
+                    ViewBag.DebugAfterSearch = await query.CountAsync();
+                }
+
+                if (!string.IsNullOrEmpty(genre))
+                {
+                    query = query.Where(g => g.Genres.Any(gr => gr.GenreName == genre));
+                    ViewBag.DebugAfterGenre = await query.CountAsync();
+                }
+
+                // Aplicar ordenação
+                query = sortBy switch
+                {
+                    "oldest" => query.OrderBy(g => g.ReleaseDate),
+                    "price_asc" => query.OrderBy(g => g.Price),
+                    "price_desc" => query.OrderByDescending(g => g.Price),
+                    "rating" => query.OrderByDescending(g => g.Reviews.Any() ? g.Reviews.Average(r => r.Rating) : 0),
+                    "title" => query.OrderBy(g => g.Title),
+                    _ => query.OrderByDescending(g => g.ReleaseDate) // newest (default)
+                };
+
+                var games = await query.ToListAsync();
+
+                // DEBUG: Verificar resultado final
+                ViewBag.DebugFinalCount = games.Count;
+                ViewBag.DebugFirstGameTitle = games.FirstOrDefault()?.Title ?? "Nenhum jogo";
+
+                // Passar parâmetros para a view
+                ViewBag.SearchTerm = searchTerm;
+                ViewBag.Genre = genre;
+                ViewBag.SortBy = sortBy;
+
+                return View(games);
+            }
+            catch (Exception ex)
+            {
+                // DEBUG: Capturar erros
+                ViewBag.DebugError = ex.Message;
+                ViewBag.DebugStackTrace = ex.StackTrace;
+                return View(new List<Game>());
+            }
+        }
     }
+
 }

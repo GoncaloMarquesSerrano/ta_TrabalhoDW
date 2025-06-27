@@ -65,88 +65,156 @@ namespace Ludix.Controllers
 
         // GET: Purchases/Create
         [HttpGet]
-        public async Task<IActionResult> Create(int gameId)
+        public async Task<IActionResult> Create(int gameId, int userId)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user = await _context.MyUser.FirstOrDefaultAsync(u => u.AspUser == userId);
-
-            if (user == null)
+            if (gameId == 0 || userId == 0)
             {
-                return RedirectToAction("Login", "Account");
+                return BadRequest("GameId e UserId são obrigatórios");
             }
 
             var game = await _context.Game.FindAsync(gameId);
-            if (game == null)
+            var user = await _context.MyUser.FindAsync(userId);
+
+            if (game == null || user == null)
             {
-                return NotFound();
+                return NotFound("Jogo ou usuário não encontrado");
             }
 
-            // Verificar se o jogo já foi comprado
-            var alreadyPurchased = await _context.Purchase
-                .AnyAsync(p => p.GameId == gameId && p.UserId == user.UserId);
-
-            if (alreadyPurchased)
+            if (user.Balance < game.Price)
             {
-                TempData["Message"] = "Você já possui este jogo em sua biblioteca";
+                TempData["Error"] = "Saldo insuficiente para realizar a compra";
                 return RedirectToAction("Details", "Games", new { id = gameId });
             }
+
+            var purchase = new Purchase
+            {
+                GameId = gameId,
+                UserId = userId,
+                PricePaid = game.Price // Preço já definido
+            };
 
             ViewBag.Game = game;
             ViewBag.User = user;
             ViewBag.PaymentMethods = new List<SelectListItem>
-            {
-                new SelectListItem { Value = "Cartão de Crédito", Text = "Cartão de Crédito" },
-                new SelectListItem { Value = "PayPal", Text = "PayPal" },
-                new SelectListItem { Value = "MBay", Text = "MBay" }
-            };
-
-            return View();
-        }
-
-        // POST: Purchases/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("GameId,UserId,PaymentMethod")] Purchase purchase)
-        {
-            if (ModelState.IsValid)
-            {
-                var game = await _context.Game.FindAsync(purchase.GameId);
-                if (game == null)
-                {
-                    return NotFound();
-                }
-
-                // Configurar os dados da compra
-                purchase.PurchaseDate = DateTime.Now;
-                purchase.PricePaid = game.Price;
-                purchase.Status = "Processando";
-
-                _context.Add(purchase);
-                await _context.SaveChangesAsync();
-
-                // Atualizar o saldo do usuário (se necessário)
-                var user = await _context.MyUser.FindAsync(purchase.UserId);
-                if (user != null)
-                {
-                    user.Balance -= purchase.PricePaid;
-                    await _context.SaveChangesAsync();
-                }
-
-                return RedirectToAction("Confirmation", new { id = purchase.PurchaseId });
-            }
-
-            // Recarregar dados se houver erro
-            ViewBag.Game = await _context.Game.FindAsync(purchase.GameId);
-            ViewBag.User = await _context.MyUser.FindAsync(purchase.UserId);
-            ViewBag.PaymentMethods = new List<SelectListItem>
-            {
-                new SelectListItem { Value = "Cartão de Crédito", Text = "Cartão de Crédito" },
-                new SelectListItem { Value = "PayPal", Text = "PayPal" },
-                new SelectListItem { Value = "Pix", Text = "Pix" }
-            };
+    {
+        new SelectListItem { Value = "Cartão de Crédito", Text = "Cartão de Crédito" },
+        new SelectListItem { Value = "PayPal", Text = "PayPal" },
+        new SelectListItem { Value = "Pix", Text = "Pix" }
+    };
 
             return View(purchase);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Purchase purchase)
+        {
+            Console.WriteLine($"=== DEBUG PURCHASE CREATE ===");
+            Console.WriteLine($"GameId: {purchase.GameId}");
+            Console.WriteLine($"UserId: {purchase.UserId}");
+            Console.WriteLine($"PaymentMethod: '{purchase.PaymentMethod}'");
+            Console.WriteLine($"PricePaid: {purchase.PricePaid}");
+            Console.WriteLine($"ModelState.IsValid: {ModelState.IsValid}");
+
+            // Garantir que os dados essenciais estejam presentes
+            if (purchase.GameId == 0)
+            {
+                if (int.TryParse(Request.Form["GameId"], out int gameId))
+                {
+                    purchase.GameId = gameId;
+                }
+            }
+
+            if (purchase.UserId == 0)
+            {
+                if (int.TryParse(Request.Form["UserId"], out int userId))
+                {
+                    purchase.UserId = userId;
+                }
+            }
+
+            if (string.IsNullOrEmpty(purchase.PaymentMethod))
+            {
+                purchase.PaymentMethod = Request.Form["PaymentMethod"];
+            }
+
+            // Remover erros das propriedades de navegação
+            ModelState.Remove("Game");
+            ModelState.Remove("User");
+
+            // Validação essencial
+            if (purchase.GameId == 0)
+            {
+                ModelState.AddModelError("", "Jogo não selecionado");
+                return await ReloadViewData(purchase);
+            }
+
+            if (purchase.UserId == 0)
+            {
+                ModelState.AddModelError("", "Usuário não identificado");
+                return await ReloadViewData(purchase);
+            }
+
+            if (string.IsNullOrEmpty(purchase.PaymentMethod))
+            {
+                ModelState.AddModelError("PaymentMethod", "Selecione um método de pagamento");
+                return await ReloadViewData(purchase);
+            }
+
+            // Buscar o jogo e usuário para validação
+            var game = await _context.Game.FindAsync(purchase.GameId);
+            var user = await _context.MyUser.FindAsync(purchase.UserId);
+
+            if (game == null)
+            {
+                ModelState.AddModelError("", "Jogo não encontrado");
+                return await ReloadViewData(purchase);
+            }
+
+            if (user == null)
+            {
+                ModelState.AddModelError("", "Usuário não encontrado");
+                return await ReloadViewData(purchase);
+            }
+
+            if (user.Balance < game.Price)
+            {
+                ModelState.AddModelError("", "Saldo insuficiente para realizar a compra");
+                return await ReloadViewData(purchase);
+            }
+
+            // Definir automaticamente os valores da compra
+            purchase.PurchaseDate = DateTime.Now;
+            purchase.PricePaid = game.Price; // Preço sempre do jogo
+            purchase.Status = "Processando";
+
+            // Salvar a compra
+            _context.Add(purchase);
+            await _context.SaveChangesAsync();
+
+            // Atualizar saldo do usuário
+            user.Balance -= purchase.PricePaid;
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Confirmation", new { id = purchase.PurchaseId });
+        }
+
+// Método auxiliar para recarregar os dados da view
+private async Task<IActionResult> ReloadViewData(Purchase purchase)
+        {
+            // Recarregar os dados do jogo e usuário
+            ViewBag.Game = await _context.Game.FindAsync(purchase.GameId);
+            ViewBag.User = await _context.MyUser.FindAsync(purchase.UserId);
+            ViewBag.PaymentMethods = new List<SelectListItem>
+    {
+        new SelectListItem { Value = "Cartão de Crédito", Text = "Cartão de Crédito" },
+        new SelectListItem { Value = "PayPal", Text = "PayPal" },
+        new SelectListItem { Value = "Pix", Text = "Pix" }
+    };
+
+            return View(purchase);
+        }
+
 
         // GET: Purchases/Confirmation/5
         public async Task<IActionResult> Confirmation(int id)
@@ -164,7 +232,7 @@ namespace Ludix.Controllers
                 return NotFound();
             }
 
-            return View();
+            return View(purchase);
         }
 
         // GET: Purchases/Edit/5
@@ -265,9 +333,24 @@ namespace Ludix.Controllers
         }
 
         [HttpGet]
-        public Task<IActionResult> Checkout(int gameId)
+        public async Task<IActionResult> Checkout(int gameId)
         {
-            return Create(gameId); // reutiliza a lógica de Create
+            // Obter o ID do usuário logado
+            var userId = GetCurrentUserId(); // Você precisa implementar este método
+
+            if (userId == 0)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // Reutilizar a lógica do Create
+            return await Create(gameId, userId);
+        }
+
+        private int GetCurrentUserId()
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return int.TryParse(userIdString, out int userId) ? userId : 0;
         }
     }
 }

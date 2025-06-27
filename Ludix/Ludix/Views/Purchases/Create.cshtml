@@ -1,60 +1,103 @@
-﻿@model Ludix.Models.Purchase
+﻿@model Purchase
 
 @{
-    ViewData["Title"] = "Nova Compra";
+    ViewData["Title"] = "Finalizar Compra";
+    var game = ViewBag.Game as Game;
+    var user = ViewBag.User as MyUser;
 }
 
-<div class="container py-4">
-    <div class="card">
-        <div class="card-header bg-primary text-white">
-            <h3>Registrar Nova Compra</h3>
-        </div>
-        <div class="card-body">
-            <form asp-action="Create">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<h2>Finalizar Compra</h2>
 
-                <div class="mb-3">
-                    <label asp-for="PurchaseDate" class="form-label">Data da Compra</label>
-                    <input asp-for="PurchaseDate" class="form-control" placeholder="dd/mm/aaaa hh:mm" />
-                    <span asp-validation-for="PurchaseDate" class="text-danger"></span>
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4>Detalhes da Compra</h4>
+            </div>
+            <div class="card-body">
+                <!-- Informações do Jogo (Somente Leitura) -->
+                <div class="form-group">
+                    <label><strong>Jogo:</strong></label>
+                    <p>@game?.Name</p>
                 </div>
 
-                <div class="mb-3">
-                    <label asp-for="PricePaid" class="form-label">Preço Pago</label>
-                    <input asp-for="PricePaid" class="form-control" placeholder="R$ 0,00" />
-                    <span asp-validation-for="PricePaid" class="text-danger"></span>
+                <div class="form-group">
+                    <label><strong>Preço:</strong></label>
+                    <p class="text-success">€@game?.Price.ToString("F2")</p>
                 </div>
 
-                <div class="mb-3">
-                    <label asp-for="UserId" class="form-label">Usuário</label>
-                    <select asp-for="UserId" class="form-select" asp-items="ViewBag.UserId">
-                        <option value="">Selecione um usuário</option>
-                    </select>
-                    <span asp-validation-for="UserId" class="text-danger"></span>
+                <!-- Informações do Usuário (Somente Leitura) -->
+                <div class="form-group">
+                    <label><strong>Comprador:</strong></label>
+                    <p>@user?.Username</p>
                 </div>
 
-                <div class="mb-3">
-                    <label asp-for="GameId" class="form-label">Jogo</label>
-                    <select asp-for="GameId" class="form-select" asp-items="ViewBag.GameId">
-                        <option value="">Selecione um jogo</option>
-                    </select>
-                    <span asp-validation-for="GameId" class="text-danger"></span>
+                <div class="form-group">
+                    <label><strong>Saldo Atual:</strong></label>
+                    <p class="@(user?.Balance >= game?.Price ? "text-success" : "text-danger")">
+                        €@user?.Balance.ToString("F2")
+                    </p>
                 </div>
 
-                <div class="text-end">
-                    <input type="submit" value="Criar Compra" class="btn btn-success" />
+                <div class="form-group">
+                    <label><strong>Saldo Após Compra:</strong></label>
+                    <p class="text-info">€@((user?.Balance - game?.Price)?.ToString("F2"))</p>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 
-    <div class="mt-3">
-        <a asp-action="Index" class="btn btn-secondary">Voltar à Lista</a>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h4>Método de Pagamento</h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post">
+                    @Html.AntiForgeryToken()
+                    
+                    <!-- Campos ocultos com os valores pré-definidos -->
+                    <input type="hidden" asp-for="GameId" value="@Model.GameId" />
+                    <input type="hidden" asp-for="UserId" value="@Model.UserId" />
+                    <input type="hidden" asp-for="PricePaid" value="@Model.PricePaid" />
+
+                    <div class="form-group">
+                        <label asp-for="PaymentMethod" class="control-label">Método de Pagamento</label>
+                        <select asp-for="PaymentMethod" class="form-control" asp-items="ViewBag.PaymentMethods">
+                            <option value="">-- Selecione --</option>
+                        </select>
+                        <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="submit" value="Confirmar Compra" class="btn btn-success btn-block" />
+                    </div>
+                </form>
+
+                <div class="mt-3">
+                    <a href="@Url.Action("Details", "Games", new { id = Model.GameId })" class="btn btn-secondary btn-block">
+                        Cancelar
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+@if (ViewData.ModelState.ErrorCount > 0)
+{
+    <div class="alert alert-danger mt-3">
+        <ul class="mb-0">
+            @foreach (var error in ViewData.ModelState.SelectMany(x => x.Value.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
 }
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+message.txt
+4 KB

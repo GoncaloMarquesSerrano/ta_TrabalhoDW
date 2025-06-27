@@ -1,6 +1,8 @@
 ﻿@model List<Ludix.Models.Game>
 @{
     ViewData["Title"] = "Todos os Jogos";
+    // Ensure model is not null
+    var games = Model ?? new List<Ludix.Models.Game>();
 }
 
 <style>
@@ -201,6 +203,22 @@
         font-weight: 600;
         margin-bottom: 1rem;
     }
+
+    .clear-filters {
+        background: transparent;
+        color: var(--accent-gold);
+        border: 1px solid var(--accent-gold);
+        padding: 0.375rem 0.75rem;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+
+        .clear-filters:hover {
+            background: var(--accent-gold);
+            color: var(--primary-dark);
+        }
 </style>
 
 <div class="page-header">
@@ -217,31 +235,45 @@
             <div class="row g-3">
                 <div class="col-md-4">
                     <label for="searchTerm" class="form-label">Pesquisar</label>
-                    <input type="text" class="form-control" id="searchTerm" name="searchTerm" placeholder="Título, desenvolvedor...">
+                    <input type="text" class="form-control" id="searchTerm" name="searchTerm"
+                           value="@ViewBag.SearchTerm" placeholder="Título, desenvolvedor...">
                 </div>
                 <div class="col-md-3">
                     <label for="genre" class="form-label">Gênero</label>
                     <select class="form-select" id="genre" name="genre">
                         <option value="">Todos</option>
-                        @foreach (var genre in Model.SelectMany(g => g.Genres).Select(g => g.GenreName).Distinct())
+                        @{
+                            // Obter todos os gêneros disponíveis no sistema
+                            var allGenres = ViewContext.HttpContext.RequestServices
+                            .GetService(typeof(Ludix.Data.LudixContext)) as Ludix.Data.LudixContext;
+                            var availableGenres = allGenres?.Genre?.Select(g => g.GenreName).Distinct().ToList() ?? new List<string>();
+                        }
+                        @foreach (var genreName in availableGenres)
                         {
-                            <option value="@genre">@genre</option>
+                            var isSelected = ViewBag.Genre as string == genreName;
+                            <option value="@genreName" selected="@isSelected">@genreName</option>
                         }
                     </select>
                 </div>
                 <div class="col-md-3">
                     <label for="sortBy" class="form-label">Ordenar por</label>
                     <select class="form-select" id="sortBy" name="sortBy">
-                        <option value="newest">Mais recentes</option>
-                        <option value="oldest">Mais antigos</option>
-                        <option value="price_asc">Preço: menor primeiro</option>
-                        <option value="price_desc">Preço: maior primeiro</option>
-                        <option value="rating">Melhor avaliados</option>
-                        <option value="title">Título (A-Z)</option>
+                        @{
+                            var currentSortBy = ViewBag.SortBy as string ?? "newest";
+                        }
+                        <option value="newest" selected="@(currentSortBy == "newest")">Mais recentes</option>
+                        <option value="oldest" selected="@(currentSortBy == "oldest")">Mais antigos</option>
+                        <option value="price_asc" selected="@(currentSortBy == "price_asc")">Preço: menor primeiro</option>
+                        <option value="price_desc" selected="@(currentSortBy == "price_desc")">Preço: maior primeiro</option>
+                        <option value="rating" selected="@(currentSortBy == "rating")">Melhor avaliados</option>
+                        <option value="title" selected="@(currentSortBy == "title")">Título (A-Z)</option>
                     </select>
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-filter w-100">Filtrar</button>
+                    <div class="d-flex flex-column w-100 gap-2">
+                        <button type="submit" class="btn btn-filter">Filtrar</button>
+                        <a href="@Url.Action("AllGames")" class="clear-filters text-center">Limpar</a>
+                    </div>
                 </div>
             </div>
         </form>
@@ -250,7 +282,15 @@
     <div class="row mb-3">
         <div class="col-md-6">
             <div class="game-count">
-                @Model.Count jogos encontrados
+                @games.Count jogos encontrados
+                @if (!string.IsNullOrEmpty(ViewBag.SearchTerm as string))
+                {
+                    <span style="color: #8892b0;"> para "@ViewBag.SearchTerm"</span>
+                }
+                @if (!string.IsNullOrEmpty(ViewBag.Genre as string))
+                {
+                    <span style="color: #8892b0;"> no gênero "@ViewBag.Genre"</span>
+                }
             </div>
         </div>
         <div class="col-md-6">
@@ -263,9 +303,9 @@
     </div>
 
     <div class="row">
-        @if (Model != null && Model.Any())
+        @if (games.Any())
         {
-            @foreach (var game in Model)
+            @foreach (var game in games)
             {
                 <div class="col-md-4 mb-4">
                     <div class="card game-card h-100">
@@ -276,7 +316,7 @@
                         <div class="card-body d-flex flex-column">
                             <h2 class="card-title">@game.Title</h2>
 
-                            @if (game.Reviews.Any())
+                            @if (game.Reviews != null && game.Reviews.Any())
                             {
                                 <div class="rating-stars">
                                     @{
@@ -307,8 +347,8 @@
                             }
 
                             <p class="card-text flex-grow-1">
-                                <strong>Descrição:</strong> @(game.Description.Length > 100 ? game.Description.Substring(0, 100) + "..." : game.Description)<br>
-                                <strong>Desenvolvedor:</strong> @game.Developer?.Username<br>
+                                <strong>Descrição:</strong> @(game.Description?.Length > 100 ? game.Description.Substring(0, 100) + "..." : game.Description ?? "Sem descrição")<br>
+                                <strong>Desenvolvedor:</strong> @(game.Developer?.Username ?? "Desconhecido")<br>
                                 <strong>Lançamento:</strong> @game.ReleaseDate.ToShortDateString()
                             </p>
 
@@ -336,13 +376,24 @@
             <div class="col-12">
                 <div class="no-games">
                     <h3>Nenhum jogo encontrado</h3>
-                    <p>Não foi possível encontrar jogos com os critérios de pesquisa selecionados.</p>
+                    <p>
+                        @if (!string.IsNullOrEmpty(ViewBag.SearchTerm as string) || !string.IsNullOrEmpty(ViewBag.Genre as string))
+                        {
+                            <span>Não foi possível encontrar jogos com os critérios de pesquisa selecionados.</span>
+                            <br>
+                            <a href="@Url.Action("AllGames")" class="btn btn-filter mt-2">Ver todos os jogos</a>
+                        }
+                        else
+                        {
+                            <span>Não há jogos cadastrados no momento.</span>
+                        }
+                    </p>
                 </div>
             </div>
         }
     </div>
 
-    @if (Model != null && Model.Any())
+    @if (games.Any())
     {
         <nav aria-label="Page navigation" class="mt-4">
             <ul class="pagination justify-content-center">

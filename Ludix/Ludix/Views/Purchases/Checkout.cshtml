@@ -12,16 +12,21 @@
                     <h3>Finalizar Compra</h3>
                 </div>
                 <div class="card-body">
-                    <form asp-controller="Purchases" asp-action="Confirmation">
+                    <!-- CORREÇÃO: asp-action deve ser "Create", não "Confirmation" -->
+                    <form asp-controller="Purchases" asp-action="Create" method="post">
                         @Html.AntiForgeryToken()
-                        <input type="hidden" name="gameId" value="@game.GameId" />
+                        
+                        <!-- CORREÇÃO: Adicionar campos ocultos com nomes corretos -->
+                        <input type="hidden" name="GameId" value="@game.GameId" />
+                        <input type="hidden" name="UserId" value="@user.UserId" />
 
                         <h4>@game.Name</h4>
                         <p class="h5 text-success">@game.Price.ToString("C")</p>
                         <hr>
 
                         <h5 class="mt-4">Método de Pagamento</h5>
-                        <select name="paymentMethod" class="form-select mb-3" required>
+                        <!-- CORREÇÃO: Nome do campo deve ser "PaymentMethod" (com P maiúsculo) -->
+                        <select name="PaymentMethod" class="form-select mb-3" required>
                             <option value="">Selecione...</option>
                             @foreach (var method in paymentMethods)
                             {
@@ -93,9 +98,17 @@
 @section Scripts {
     <script>
         // Mostrar/ocultar seção de cartão de crédito
-        document.querySelector('select[name="paymentMethod"]').addEventListener('change', function() {
+        document.querySelector('select[name="PaymentMethod"]').addEventListener('change', function() {
             const creditCardSection = document.getElementById('creditCardSection');
             creditCardSection.style.display = this.value === 'Cartão de Crédito' ? 'block' : 'none';
+        });
+
+        // Debug: Verificar valores antes de submeter
+        document.querySelector('form').addEventListener('submit', function(e) {
+            console.log('=== SUBMIT DEBUG ===');
+            console.log('GameId:', document.querySelector('input[name="GameId"]').value);
+            console.log('UserId:', document.querySelector('input[name="UserId"]').value);
+            console.log('PaymentMethod:', document.querySelector('select[name="PaymentMethod"]').value);
         });
     </script>
 }
