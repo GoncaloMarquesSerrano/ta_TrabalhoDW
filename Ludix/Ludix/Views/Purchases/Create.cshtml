@@ -1,46 +1,60 @@
 ﻿@model Ludix.Models.Purchase
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Nova Compra";
 }
 
-<h1>Create</h1>
+<div class="container py-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3>Registrar Nova Compra</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-<h4>Purchase</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="PurchaseDate" class="control-label"></label>
-                <input asp-for="PurchaseDate" class="form-control" />
-                <span asp-validation-for="PurchaseDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PricePaid" class="control-label"></label>
-                <input asp-for="PricePaid" class="form-control" />
-                <span asp-validation-for="PricePaid" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UserId" class="control-label"></label>
-                <select asp-for="UserId" class ="form-control" asp-items="ViewBag.UserId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="GameId" class="control-label"></label>
-                <select asp-for="GameId" class ="form-control" asp-items="ViewBag.GameId"></select>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+                <div class="mb-3">
+                    <label asp-for="PurchaseDate" class="form-label">Data da Compra</label>
+                    <input asp-for="PurchaseDate" class="form-control" placeholder="dd/mm/aaaa hh:mm" />
+                    <span asp-validation-for="PurchaseDate" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="PricePaid" class="form-label">Preço Pago</label>
+                    <input asp-for="PricePaid" class="form-control" placeholder="R$ 0,00" />
+                    <span asp-validation-for="PricePaid" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="UserId" class="form-label">Usuário</label>
+                    <select asp-for="UserId" class="form-select" asp-items="ViewBag.UserId">
+                        <option value="">Selecione um usuário</option>
+                    </select>
+                    <span asp-validation-for="UserId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="GameId" class="form-label">Jogo</label>
+                    <select asp-for="GameId" class="form-select" asp-items="ViewBag.GameId">
+                        <option value="">Selecione um jogo</option>
+                    </select>
+                    <span asp-validation-for="GameId" class="text-danger"></span>
+                </div>
+
+                <div class="text-end">
+                    <input type="submit" value="Criar Compra" class="btn btn-success" />
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a asp-action="Index" class="btn btn-secondary">Voltar à Lista</a>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

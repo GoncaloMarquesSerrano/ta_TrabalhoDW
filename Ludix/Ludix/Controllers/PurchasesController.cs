@@ -164,7 +164,7 @@ namespace Ludix.Controllers
                 return NotFound();
             }
 
-            return View(purchase);
+            return View();
         }
 
         // GET: Purchases/Edit/5

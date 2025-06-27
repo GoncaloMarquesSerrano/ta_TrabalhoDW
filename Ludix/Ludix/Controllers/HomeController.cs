@@ -64,6 +64,11 @@ namespace Ludix.Controllers
             return View();
         }
 
+        public IActionResult AllGames()
+        {
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();

@@ -12,7 +12,8 @@
                     <h3>Finalizar Compra</h3>
                 </div>
                 <div class="card-body">
-                    <form asp-action="Checkout" method="post">
+                    <form asp-controller="Purchases" asp-action="Confirmation">
+                        @Html.AntiForgeryToken()
                         <input type="hidden" name="gameId" value="@game.GameId" />
 
                         <h4>@game.Name</h4>
@@ -94,7 +95,7 @@
         // Mostrar/ocultar seção de cartão de crédito
         document.querySelector('select[name="paymentMethod"]').addEventListener('change', function() {
             const creditCardSection = document.getElementById('creditCardSection');
-            creditCardSection.style.display = this.value === 'CreditCard' ? 'block' : 'none';
+            creditCardSection.style.display = this.value === 'Cartão de Crédito' ? 'block' : 'none';
         });
     </script>
 }

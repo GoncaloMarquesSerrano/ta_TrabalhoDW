@@ -572,5 +572,12 @@ namespace Ludix.Controllers
             return await _context.MyUser
                 .FirstOrDefaultAsync(u => u.AspUser == identityUser.Id);
         }
+
+        // GET: /Games/AllGames
+        public async Task<IActionResult> AllGames()
+        {
+            var games = await _context.Game.ToListAsync();
+            return View(games); // View = AllGames.cshtml
+        }
     }
 }
