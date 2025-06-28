@@ -4,9 +4,11 @@ using Ludix.Data;
 using Ludix.Models;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Ludix.Controllers
 {
+    [Authorize]
     public class PurchasesController : Controller
     {
         private readonly LudixContext _context;

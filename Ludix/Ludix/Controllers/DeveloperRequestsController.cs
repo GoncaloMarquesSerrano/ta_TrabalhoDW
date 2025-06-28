@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Ludix.Controllers
 {
-    [Authorize]
+    [Authorize(Policy ="Admin")]
     public class DeveloperRequestsController : Controller
     {
         private readonly LudixContext _context;

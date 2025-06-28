@@ -35,6 +35,13 @@ builder.Services.AddAuthorization(options =>
             context.User.HasClaim("IsDeveloper", "True")));
 });
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Admin", policy =>
+        policy.RequireAssertion(context =>
+            context.User.HasClaim("IsAdmin", "True")));
+});
+
 // Configuracao do SendGrid
 builder.Services.Configure<SendGridSettings>(builder.Configuration.GetSection("SendGrid"));
 builder.Services.AddTransient<IEmailSender, SendGridEmailSender>();
