@@ -1,23 +1,124 @@
 ﻿@page
 @model RegisterConfirmationModel
 @{
-    ViewData["Title"] = "Register confirmation";
+    ViewData["Title"] = "Confirmação de Registro";
 }
 
-<h1>@ViewData["Title"]</h1>
-@{
-    if (@Model.DisplayConfirmAccountLink)
-    {
-<p>
-    This app does not currently have a real email sender registered, see <a href="https://aka.ms/aspaccountconf">these docs</a> for how to configure a real email sender.
-    Normally this would be emailed: <a id="confirm-link" href="@Model.EmailConfirmationUrl">Click here to confirm your account</a>
-</p>
+<style>
+    :root {
+        --primary-dark: #0a192f;
+        --secondary-dark: #172a45;
+        --accent-gold: #FFD700;
+        --text-light: #e6f1ff;
+        --info-blue: #4a90e2;
     }
-    else
-    {
-<p>
-        Please check your email to confirm your account.
-</p>
-    }
-}
 
+    body {
+        background-color: var(--primary-dark);
+        color: var(--text-light);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 1rem;
+    }
+
+    .confirmation-container {
+        background-color: var(--secondary-dark);
+        border-radius: 10px;
+        padding: 3rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        border: 1px solid rgba(255, 215, 0, 0.2);
+        max-width: 600px;
+        width: 100%;
+        text-align: center;
+    }
+
+    h1 {
+        color: var(--accent-gold);
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .confirmation-icon {
+        font-size: 4rem;
+        color: var(--info-blue);
+        margin-bottom: 2rem;
+    }
+
+    p {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+    }
+
+    .confirm-link {
+        display: inline-block;
+        background-color: var(--accent-gold);
+        color: var(--primary-dark);
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 30px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        margin: 1rem 0;
+    }
+
+        .confirm-link:hover {
+            background-color: transparent;
+            color: var(--accent-gold);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+            border: 2px solid var(--accent-gold);
+        }
+
+    .info-message {
+        background-color: rgba(74, 144, 226, 0.1);
+        border-left: 4px solid var(--info-blue);
+        padding: 1rem;
+        margin: 2rem 0;
+        text-align: left;
+        border-radius: 0 4px 4px 0;
+    }
+
+    .email-icon {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        color: var(--accent-gold);
+    }
+
+    .docs-link {
+        color: var(--accent-gold);
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+        .docs-link:hover {
+            text-decoration: underline;
+        }
+</style>
+
+<div class="confirmation-container">
+    <h1>@ViewData["Title"]</h1>
+
+    @{
+        if (@Model.DisplayConfirmAccountLink)
+        {
+            <div class="confirmation-icon">✉️</div>
+            <div class="info-message">
+                <p>Este aplicativo não tem atualmente um serviço de email real registrado. Consulte <a href="https://aka.ms/aspaccountconf" class="docs-link">esta documentação</a> para configurar um serviço de email real.</p>
+                <p>Normalmente, isto seria enviado por email:</p>
+            </div>
+            <a id="confirm-link" href="@Model.EmailConfirmationUrl" class="confirm-link">Clique aqui para confirmar sua conta</a>
+        }
+        else
+        {
+            <div class="confirmation-icon">📨</div>
+            <div class="email-icon">✉️</div>
+            <p>Por favor, verifique seu email para confirmar sua conta.</p>
+            <p>Se não encontrar o email na sua caixa de entrada, verifique a pasta de spam.</p>
+        }
+    }
+</div>

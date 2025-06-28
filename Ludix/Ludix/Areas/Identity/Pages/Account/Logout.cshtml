@@ -1,21 +1,102 @@
 ﻿@page
 @model LogoutModel
 @{
-    ViewData["Title"] = "Log out";
+    ViewData["Title"] = "Terminar Sessão";
 }
 
-<header>
-    <h1>@ViewData["Title"]</h1>
-    @{
-        if (User.Identity?.IsAuthenticated ?? false)
-        {
-            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
-                <button type="submit" class="nav-link btn btn-link text-dark">Click here to Logout</button>
-            </form>
-        }
-        else
-        {
-            <p>You have successfully logged out of the application.</p>
-        }
+<style>
+    :root {
+        --primary-dark: #0a192f;
+        --secondary-dark: #172a45;
+        --accent-gold: #FFD700;
+        --text-light: #e6f1ff;
+        --hover-gold: #ffd900cc;
     }
+
+    body {
+        background-color: var(--primary-dark);
+        color: var(--text-light);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    header {
+        max-width: 800px;
+        margin: 5rem auto;
+        padding: 2rem;
+        background-color: var(--secondary-dark);
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        border: 1px solid rgba(255,215,0,0.1);
+        text-align: center;
+    }
+
+    h1 {
+        color: var(--accent-gold);
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+    }
+
+    p {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+    }
+
+    .btn-logout {
+        background-color: transparent;
+        border: 2px solid var(--accent-gold);
+        color: var(--accent-gold);
+        font-weight: 600;
+        padding: 0.75rem 2rem;
+        border-radius: 30px;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+        .btn-logout:hover {
+            background-color: var(--accent-gold);
+            color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+
+    .logout-message {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .icon {
+        font-size: 3rem;
+        color: var(--accent-gold);
+    }
+</style>
+
+<header>
+    <div class="logout-message">
+        @{
+            if (User.Identity?.IsAuthenticated ?? false)
+            {
+                <div>
+                    <div class="icon">🔒</div>
+                    <h1>@ViewData["Title"]</h1>
+                    <p>Tem a certeza que deseja terminar a sua sessão?</p>
+                    <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
+                        <button type="submit" class="btn-logout">Confirmar Logout</button>
+                    </form>
+                </div>
+            }
+            else
+            {
+                <div>
+                    <div class="icon">👋</div>
+                    <h1>Sessão Terminada</h1>
+                    <p>Terminou a sessão com sucesso.</p>
+                    <a href="/" class="btn-logout">Voltar à Página Inicial</a>
+                </div>
+            }
+        }
+    </div>
 </header>
