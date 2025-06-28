@@ -142,7 +142,6 @@ namespace Ludix.Controllers
                 TempData["Error"] = "Perfil de utilizador não encontrado. Contacte o administrador.";
                 return RedirectToAction("Details", "Games", new { id = review.GameId });
             }
-
             // Verificar se já existe uma review deste utilizador para este jogo
             var existingReview = await _context.Review
                 .FirstOrDefaultAsync(r => r.GameId == review.GameId && r.UserId == currentUser.UserId);
