@@ -55,7 +55,7 @@ namespace Ludix.Models
         /// </summary>
         [Display(Name = "Utilizador")]
         [ValidateNever]
-        public MyUser? MyUser { get; set; } = new MyUser();
+        public MyUser? MyUser { get; set; }
 
         /// <summary>
         /// FK para referenciar o jogo que foi avaliado
@@ -69,6 +69,6 @@ namespace Ludix.Models
         /// </summary>
         [Display(Name = "Jogo")]
         [ValidateNever]
-        public Game? Game { get; set; } = new Game();
+        public Game? Game { get; set; }
     }
 }

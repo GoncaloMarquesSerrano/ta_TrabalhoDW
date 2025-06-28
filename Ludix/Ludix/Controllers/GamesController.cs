@@ -49,7 +49,9 @@ namespace Ludix.Controllers
             var game = await _context.Game
                 .Include(g => g.Developer)
                 .Include(g => g.Genres)
+                .Include(g => g.Purchases)
                 .Include(g => g.Reviews)
+                    .ThenInclude(r => r.MyUser)
                 .FirstOrDefaultAsync(m => m.GameId == id);
 
             if (game == null)
