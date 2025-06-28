@@ -39,13 +39,13 @@ namespace Ludix.Controllers
             return View(user);
         }
 
-        // GET: Wallet/AddFunds
+        // GET: MyUsers/AddFunds
         public IActionResult AddFunds()
         {
             return View();
         }
 
-        // POST: Wallet/AddFunds
+        // POST: MyUsers/AddFunds
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddFunds(decimal amount)
@@ -71,60 +71,8 @@ namespace Ludix.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // POST: Wallet/PurchaseGame
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> PurchaseGame(int gameId)
-        {
-            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var user = await _context.MyUser
-                .Include(u => u.Purchases)
-                .FirstOrDefaultAsync(u => u.AspUser == currentUserId);
 
-            if (user == null)
-            {
-                return NotFound("Utilizador não encontrado.");
-            }
-
-            var game = await _context.Game.FindAsync(gameId);
-            if (game == null)
-            {
-                return NotFound("Jogo não encontrado.");
-            }
-
-            // Verificar se o utilizador já possui o jogo
-            var existingPurchase = user.Purchases.FirstOrDefault(p => p.GameId == gameId);
-            if (existingPurchase != null)
-            {
-                TempData["ErrorMessage"] = "Já possui este jogo na sua biblioteca.";
-                return RedirectToAction("Details", "Games", new { id = gameId });
-            }
-
-            // Verificar se tem saldo suficiente
-            if (user.Balance < game.Price)
-            {
-                TempData["ErrorMessage"] = $"Saldo insuficiente. Necessário: {game.Price:C} | Disponível: {user.Balance:C}";
-                return RedirectToAction("Details", "Games", new { id = gameId });
-            }
-
-            // Realizar a compra
-            var purchase = new Purchase
-            {
-                UserId = user.UserId,
-                GameId = gameId,
-                PurchaseDate = DateTime.Now,
-                PricePaid = game.Price
-            };
-
-            user.Balance -= game.Price;
-            _context.Purchase.Add(purchase);
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = $"Jogo '{game.Title}' comprado com sucesso! Saldo restante: {user.Balance:C}";
-            return RedirectToAction("Details", "Games", new { id = gameId });
-        }
-
-        // GET: Wallet/Library
+        // GET: MyUsers/Library
         public async Task<IActionResult> Library()
         {
             var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

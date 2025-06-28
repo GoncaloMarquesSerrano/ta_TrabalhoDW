@@ -45,7 +45,7 @@ namespace Ludix.Controllers
             // Verificar saldo
             if (user.Balance < game.Price)
             {
-                TempData["ErrorMessage"] = "Saldo insuficiente para completar a compra.";
+                TempData["ErrorMessage"] = "Saldo insuficiente para concluir a compra.";
                 return RedirectToAction("Details", "Games", new { id });
             }
 
@@ -72,7 +72,7 @@ namespace Ludix.Controllers
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"Ocorreu um erro ao processar a compra: {ex.Message}";
+                TempData["ErrorMessage"] = $"Ocorreu um erro durante a compra: {ex.Message}";
                 return RedirectToAction("Details", "Games", new { id });
             }
         }

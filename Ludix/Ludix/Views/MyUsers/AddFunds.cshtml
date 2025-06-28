@@ -181,13 +181,13 @@
             const amountInput = document.getElementById('amount');
             const suggestedButtons = document.querySelectorAll('.suggested-amount');
 
-            // Handle suggested amount buttons
+            // lidar com os botões sugeridos
             suggestedButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     const amount = this.getAttribute('data-amount');
                     amountInput.value = amount;
 
-                    // Visual feedback
+                    // butões sugeridos ficam brilhantes
                     suggestedButtons.forEach(btn => {
                         btn.classList.remove('btn-primary');
                         btn.classList.add('btn-outline-primary');
@@ -217,7 +217,7 @@
                 });
             });
 
-            // Form validation
+            // validação do formulário
             const form = document.querySelector('form');
             form.addEventListener('submit', function(e) {
                 const amount = parseFloat(amountInput.value);
@@ -228,7 +228,7 @@
                     return false;
                 }
 
-                // Confirmation dialog
+                // confirmação antes de adicionar fundos
                 if (!confirm(`Confirma a adição de ${amount.toFixed(2)}€ à sua carteira?`)) {
                     e.preventDefault();
                     return false;
