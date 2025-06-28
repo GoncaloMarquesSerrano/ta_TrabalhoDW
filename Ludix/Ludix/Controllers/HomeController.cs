@@ -22,17 +22,16 @@ namespace Ludix.Controllers
 
         public async Task<IActionResult> Index()
         {
-            
             var featuredGames = await _context.Game
                 .Include(g => g.Reviews)
                 .Include(g => g.Developer)
                 .Include(g => g.Genres)
                 .OrderByDescending(g => g.Reviews.Average(r => r.Rating))
                 .ThenByDescending(g => g.Reviews.Count)
-                .Take(6) 
+                .Take(6)
                 .ToListAsync();
 
-            // Se nao houver jogos com reviews os mais recentes
+            // Se não houver jogos com reviews, pegar os mais recentes
             if (!featuredGames.Any())
             {
                 featuredGames = await _context.Game
@@ -60,11 +59,6 @@ namespace Ludix.Controllers
         }
 
         public IActionResult Wishlist()
-        {
-            return View();
-        }
-
-        public IActionResult AllGames()
         {
             return View();
         }

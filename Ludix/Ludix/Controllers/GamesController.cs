@@ -573,13 +573,6 @@ namespace Ludix.Controllers
                 .FirstOrDefaultAsync(u => u.AspUser == identityUser.Id);
         }
 
-        // GET: /Games/AllGames
-        public async Task<IActionResult> AllGames()
-        {
-            var games = await _context.Game.ToListAsync();
-            return View(games); // View = AllGames.cshtml
-        }
-
         [Authorize]
         public async Task<IActionResult> Checkout(int? id)
         {
@@ -630,7 +623,8 @@ namespace Ludix.Controllers
                 .AnyAsync(p => p.GameId == gameId && p.UserId == userId);
         }
 
-        // GET: /Games/AllGames
+        // GET: /Games/AllGames 
+        [AllowAnonymous]
         public async Task<IActionResult> AllGames(string searchTerm, string genre, string sortBy = "newest")
         {
             try
@@ -642,6 +636,7 @@ namespace Ludix.Controllers
                 if (totalGamesCount == 0)
                 {
                     ViewBag.DebugMessage = "Não há jogos na base de dados";
+                    ViewData["Title"] = "Todos os Jogos";
                     return View(new List<Game>());
                 }
 
@@ -659,10 +654,11 @@ namespace Ludix.Controllers
                 // Aplicar filtros apenas se especificados
                 if (!string.IsNullOrEmpty(searchTerm))
                 {
+                    searchTerm = searchTerm.Trim();
                     query = query.Where(g =>
-                        g.Title.Contains(searchTerm) ||
-                        g.Description.Contains(searchTerm) ||
-                        (g.Developer != null && g.Developer.Username.Contains(searchTerm)));
+                        EF.Functions.Like(g.Title, $"%{searchTerm}%") ||
+                        EF.Functions.Like(g.Description ?? "", $"%{searchTerm}%") ||
+                        (g.Developer != null && EF.Functions.Like(g.Developer.Username ?? "", $"%{searchTerm}%")));
 
                     ViewBag.DebugAfterSearch = await query.CountAsync();
                 }
@@ -695,6 +691,16 @@ namespace Ludix.Controllers
                 ViewBag.Genre = genre;
                 ViewBag.SortBy = sortBy;
 
+                // Certificar que o ViewData["Title"] está definido
+                ViewData["Title"] = "Todos os Jogos";
+
+                // Log para debug
+                Console.WriteLine($"AllGames: Retornando {games.Count} jogos");
+                foreach (var game in games.Take(3))
+                {
+                    Console.WriteLine($"Jogo: {game.Title}, Dev: {game.Developer?.Username}, Genres: {game.Genres?.Count}");
+                }
+
                 return View(games);
             }
             catch (Exception ex)
@@ -702,6 +708,8 @@ namespace Ludix.Controllers
                 // DEBUG: Capturar erros
                 ViewBag.DebugError = ex.Message;
                 ViewBag.DebugStackTrace = ex.StackTrace;
+                Console.WriteLine($"Erro em AllGames: {ex.Message}");
+                ViewData["Title"] = "Todos os Jogos";
                 return View(new List<Game>());
             }
         }
