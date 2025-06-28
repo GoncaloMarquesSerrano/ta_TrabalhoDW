@@ -49,18 +49,6 @@ namespace Ludix.Controllers
             return View(featuredGames);
         }
 
-        public async Task<IActionResult> Gaymes()
-        {
-            var games = await _context.Game
-                .Include(g => g.Reviews)
-                .Include(g => g.Developer)
-                .Include(g => g.Genres)
-                .OrderBy(g => g.Title)
-                .ToListAsync();
-
-            return View(games);
-        }
-
         public IActionResult Privacy()
         {
             return View();

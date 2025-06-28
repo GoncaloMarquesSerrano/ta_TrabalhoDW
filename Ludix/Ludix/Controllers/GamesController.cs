@@ -125,12 +125,10 @@ namespace Ludix.Controllers
                 var currentUser = await GetCurrentUserAsync();
                 Developer developer = null;
 
-                // CORREÇÃO: Se é admin e selecionou um desenvolvedor específico
                 if (currentUser != null && currentUser.IsAdmin && selectedDeveloperId.HasValue)
                 {
                     developer = await _context.Developer.FindAsync(selectedDeveloperId.Value);
 
-                    // ADICIONADO: Verificar se o desenvolvedor selecionado existe
                     if (developer == null)
                     {
                         ModelState.AddModelError("", "O desenvolvedor selecionado não é válido.");
@@ -141,7 +139,6 @@ namespace Ludix.Controllers
                 }
                 else if (currentUser != null && currentUser.IsAdmin && !selectedDeveloperId.HasValue)
                 {
-                    // ADICIONADO: Se é admin mas não selecionou um desenvolvedor
                     ModelState.AddModelError("", "Como administrador, deve selecionar um desenvolvedor para o jogo.");
                     ViewBag.AllGenres = await _context.Genre.ToListAsync();
                     ViewBag.AllDevelopers = await _context.Developer.ToListAsync();
@@ -149,7 +146,6 @@ namespace Ludix.Controllers
                 }
                 else
                 {
-                    // Procurar utilizador autenticado como desenvolvedor
                     var username = User.Identity?.Name;
                     developer = await _context.Developer
                         .FirstOrDefaultAsync(d => d.Email == username);
@@ -157,7 +153,6 @@ namespace Ludix.Controllers
 
                 if (developer == null)
                 {
-                    // MELHORADO: Mensagem de erro mais específica
                     string errorMessage = currentUser != null && currentUser.IsAdmin
                         ? "Desenvolvedor selecionado não encontrado."
                         : "A sua conta não está associada a um perfil de desenvolvedor.";
@@ -204,6 +199,19 @@ namespace Ludix.Controllers
                 ViewBag.AllDevelopers = await _context.Developer.ToListAsync();
             }
             return View(game);
+        }
+
+        // GET: Games/AllGames - Lista todos os jogos (público)
+        [AllowAnonymous]
+        public async Task<IActionResult> AllGames()
+        {
+            var games = await _context.Game
+                .Include(g => g.Developer)
+                .Include(g => g.Genres)
+                .OrderByDescending(g => g.ReleaseDate)
+                .ToListAsync();
+
+            return View(games);
         }
 
         // GET: Games/Edit/5
