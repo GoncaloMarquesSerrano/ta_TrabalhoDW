@@ -7,8 +7,7 @@
     
     // Verificar se é desenvolvedor ou admin
     bool isDeveloper = Model.Developer?.AspUser == currentUserId;
-    bool isAdmin = ViewBag.IsAdmin != null ? (bool)ViewBag.IsAdmin : false;
-    bool canManageGame = isDeveloper || isAdmin;
+    bool canManageGame = isDeveloper;
     
 }
 
@@ -264,25 +263,11 @@
                             {
                                 <span class="badge bg-info ms-1">Desenvolvedor</span>
                             }
-                            @if (isAdmin)
-                            {
-                                <span class="badge bg-danger ms-1">Admin</span>
-                            }
                         </h6>
                         <div class="d-grid gap-1">
                             <a href="@Url.Action("Edit", "Games", new { id = Model.GameId })" class="btn btn-outline-warning btn-sm">
                                 <i class="fas fa-edit"></i> Editar Jogo
                             </a>
-                            
-                            @if (isAdmin)
-                            {
-                                <a href="@Url.Action("Index", "Purchase")" class="btn btn-outline-info btn-sm">
-                                    <i class="fas fa-chart-line"></i> Ver Vendas
-                                </a>
-                                <a href="@Url.Action("Delete", "Games", new { id = Model.GameId })" class="btn btn-outline-danger btn-sm">
-                                    <i class="fas fa-trash"></i> Eliminar Jogo
-                                </a>
-                            }
                         </div>
                     }
                 </div>
