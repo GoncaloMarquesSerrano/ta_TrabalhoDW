@@ -1,0 +1,267 @@
+﻿@model List<Ludix.Models.Purchase>
+@{
+    ViewData["Title"] = "Minha Biblioteca";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3><i class="fas fa-gamepad"></i> Minha Biblioteca</h3>
+                    <div class="d-flex align-items-center">
+                        <span class="badge bg-primary me-3">@Model.Count() jogos</span>
+                        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-wallet"></i> Voltar à Carteira
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (Model != null && Model.Any())
+                    {
+                        <!-- Filtros e Ordenação -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                    <input type="text" class="form-control" id="searchInput" placeholder="Pesquisar jogos...">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="sortSelect">
+                                    <option value="recent">Mais Recentes</option>
+                                    <option value="oldest">Mais Antigos</option>
+                                    <option value="name-asc">Nome (A-Z)</option>
+                                    <option value="name-desc">Nome (Z-A)</option>
+                                    <option value="price-desc">Preço (Maior)</option>
+                                    <option value="price-asc">Preço (Menor)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="btn-group w-100" role="group">
+                                    <input type="radio" class="btn-check" name="viewMode" id="gridView" checked>
+                                    <label class="btn btn-outline-secondary" for="gridView">
+                                        <i class="fas fa-th"></i>
+                                    </label>
+                                    <input type="radio" class="btn-check" name="viewMode" id="listView">
+                                    <label class="btn btn-outline-secondary" for="listView">
+                                        <i class="fas fa-list"></i>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Vista em Grelha -->
+                        <div id="gridContainer" class="row">
+                            @foreach (var purchase in Model)
+                            {
+                                <div class="col-lg-4 col-md-6 mb-4 game-item" 
+                                     data-name="@purchase.Game.Title.ToLower()" 
+                                     data-date="@purchase.PurchaseDate.ToString("yyyy-MM-dd")"
+                                     data-price="@purchase.PricePaid">
+                                    <div class="card h-100">
+                                        <div class="position-relative">
+                                            @if (!string.IsNullOrEmpty(purchase.Game.Cover))
+                                            {
+                                                <img src="~/covers/@purchase.Game.Cover" alt="@purchase.Game.Title" 
+                                                     class="card-img-top" style="height: 200px; object-fit: cover;">
+                                            }
+                                            else
+                                            {
+                                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                                    <i class="fas fa-gamepad fa-3x text-muted"></i>
+                                                </div>
+                                            }
+                                            <div class="position-absolute top-0 end-0 p-2">
+                                                <span class="badge bg-success">Comprado</span>
+                                            </div>
+                                        </div>
+                                        <div class="card-body d-flex flex-column">
+                                            <h5 class="card-title">@purchase.Game.Title</h5>
+                                            <p class="card-text text-muted small flex-grow-1">
+                                                @if (!string.IsNullOrEmpty(purchase.Game.Description))
+                                                {
+                                                    @(purchase.Game.Description.Length > 100 ? 
+                                                      purchase.Game.Description.Substring(0, 100) + "..." : 
+                                                      purchase.Game.Description)
+                                                }
+                                            </p>
+                                            <div class="mt-auto">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-calendar"></i> @purchase.PurchaseDate.ToString("dd/MM/yyyy")
+                                                    </small>
+                                                    <span class="badge bg-primary">@purchase.PricePaid.ToString("C")</span>
+                                                </div>
+                                                @if (purchase.Game.Genres != null && purchase.Game.Genres.Any())
+                                                {
+                                                    <div class="mb-2">
+                                                        @foreach (var genre in purchase.Game.Genres.Take(3))
+                                                        {
+                                                            <span class="badge bg-secondary me-1">@genre.GenreName</span>
+                                                        }
+                                                    </div>
+                                                }
+                                                <a asp-controller="Games" asp-action="Details" asp-route-id="@purchase.Game.GameId" 
+                                                   class="btn btn-primary btn-sm w-100">
+                                                    <i class="fas fa-play"></i> Jogar
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Vista em Lista -->
+                        <div id="listContainer" class="d-none">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Jogo</th>
+                                            <th>Desenvolvedor</th>
+                                            <th>Géneros</th>
+                                            <th>Data de Compra</th>
+                                            <th>Preço Pago</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var purchase in Model)
+                                        {
+                                            <tr class="game-item" 
+                                                data-name="@purchase.Game.Title.ToLower()" 
+                                                data-date="@purchase.PurchaseDate.ToString("yyyy-MM-dd")"
+                                                data-price="@purchase.PricePaid">
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        @if (!string.IsNullOrEmpty(purchase.Game.Cover))
+                                                        {
+                                                            <img src="~/covers/@purchase.Game.Cover" alt="@purchase.Game.Title" 
+                                                                 class="me-3 rounded" style="width: 50px; height: 50px; object-fit: cover;">
+                                                        }
+                                                        <div>
+                                                            <strong>@purchase.Game.Title</strong>
+                                                            <br>
+                                                            <small class="text-muted">
+                                                                Lançado em @purchase.Game.ReleaseDate.ToString("dd/MM/yyyy")
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>@(purchase.Game.Developer?.Username ?? "N/A")</td>
+                                                <td>
+                                                    @if (purchase.Game.Genres != null && purchase.Game.Genres.Any())
+                                                    {
+                                                        @foreach (var genre in purchase.Game.Genres.Take(2))
+                                                        {
+                                                            <span class="badge bg-secondary me-1">@genre.GenreName</span>
+                                                        }
+                                                        @if (purchase.Game.Genres.Count() > 2)
+                                                        {
+                                                            <span class="text-muted">+@(purchase.Game.Genres.Count() - 2)</span>
+                                                        }
+                                                    }
+                                                </td>
+                                                <td>@purchase.PurchaseDate.ToString("dd/MM/yyyy")</td>
+                                                <td><span class="badge bg-success">@purchase.PricePaid.ToString("C")</span></td>
+                                                <td>
+                                                    <a asp-controller="Games" asp-action="Details" asp-route-id="@purchase.Game.GameId" 
+                                                       class="btn btn-sm btn-primary">
+                                                        <i class="fas fa-play"></i> Jogar
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-gamepad fa-4x text-muted mb-4"></i>
+                            <h4 class="text-muted">Biblioteca Vazia</h4>
+                            <p class="text-muted">Parece que ainda não compraste nenhum jogo.</p>
+                            <a asp-controller="Store" asp-action="Index" class="btn btn-outline-primary mt-3">
+                                <i class="fas fa-store"></i> Ir para a Loja
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const searchInput = document.getElementById("searchInput");
+            const sortSelect = document.getElementById("sortSelect");
+            const gridView = document.getElementById("gridView");
+            const listView = document.getElementById("listView");
+            const gridContainer = document.getElementById("gridContainer");
+            const listContainer = document.getElementById("listContainer");
+
+            function filterAndSortGames() {
+                const searchText = searchInput.value.toLowerCase();
+                const sortOption = sortSelect.value;
+
+                const gameItems = document.querySelectorAll(".game-item");
+
+                let games = Array.from(gameItems);
+
+                // Filtragem
+                games.forEach(game => {
+                    const name = game.dataset.name;
+                    game.style.display = name.includes(searchText) ? "" : "none";
+                });
+
+                // Ordenação
+                games = games.filter(game => game.style.display !== "none");
+                games.sort((a, b) => {
+                    switch (sortOption) {
+                        case "name-asc":
+                            return a.dataset.name.localeCompare(b.dataset.name);
+                        case "name-desc":
+                            return b.dataset.name.localeCompare(a.dataset.name);
+                        case "recent":
+                            return new Date(b.dataset.date) - new Date(a.dataset.date);
+                        case "oldest":
+                            return new Date(a.dataset.date) - new Date(b.dataset.date);
+                        case "price-asc":
+                            return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
+                        case "price-desc":
+                            return parseFloat(b.dataset.price) - parseFloat(a.dataset.price);
+                        default:
+                            return 0;
+                    }
+                });
+
+                const parent = gridView.checked ? gridContainer : listContainer.querySelector("tbody");
+                parent.innerHTML = "";
+                games.forEach(game => parent.appendChild(game));
+            }
+
+            searchInput.addEventListener("input", filterAndSortGames);
+            sortSelect.addEventListener("change", filterAndSortGames);
+
+            gridView.addEventListener("change", function () {
+                if (gridView.checked) {
+                    gridContainer.classList.remove("d-none");
+                    listContainer.classList.add("d-none");
+                }
+            });
+
+            listView.addEventListener("change", function () {
+                if (listView.checked) {
+                    listContainer.classList.remove("d-none");
+                    gridContainer.classList.add("d-none");
+                }
+            });
+        });
+    </script>
+}

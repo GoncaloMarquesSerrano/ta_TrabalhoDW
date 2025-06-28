@@ -47,8 +47,7 @@ namespace Ludix.Migrations
 
                     b.Property<string>("Cover")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -458,7 +457,7 @@ namespace Ludix.Migrations
                         .IsRequired();
 
                     b.HasOne("Ludix.Models.MyUser", "MyUser")
-                        .WithMany()
+                        .WithMany("Purchases")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -560,6 +559,11 @@ namespace Ludix.Migrations
                     b.Navigation("Purchases");
 
                     b.Navigation("Reviews");
+                });
+
+            modelBuilder.Entity("Ludix.Models.MyUser", b =>
+                {
+                    b.Navigation("Purchases");
                 });
 #pragma warning restore 612, 618
         }

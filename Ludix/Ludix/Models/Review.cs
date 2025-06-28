@@ -49,6 +49,7 @@ namespace Ludix.Models
         [ForeignKey(nameof(MyUser))]
         [Display(Name = "Utilizador")]
         public int UserId { get; set; }
+
         /// <summary>
         /// FK para referenciar o utilizador que fez a avaliacao
         /// </summary>
