@@ -143,7 +143,6 @@ namespace Ludix.Controllers
                 return RedirectToAction("Details", "Games", new { id = review.GameId });
             }
 
-<<<<<<< Goncalo
             // Verificar se já existe uma review deste utilizador para este jogo
             var existingReview = await _context.Review
                 .FirstOrDefaultAsync(r => r.GameId == review.GameId && r.UserId == currentUser.UserId);
