@@ -76,6 +76,16 @@ namespace Ludix.Models
         /// </summary>
         [Display(Name = "Data da solicitação")]
         public DateTime? DeveloperRequestDate { get; set; }
+
+        /**************
+         * Relacionamentos
+         **************/
+
+        /// <summary>
+        /// Lista das compras do utilizador
+        /// </summary>
+        [Display(Name = "Compras")]
+        public ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();
     }
 }
 

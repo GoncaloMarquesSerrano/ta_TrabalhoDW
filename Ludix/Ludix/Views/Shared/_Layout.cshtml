@@ -42,7 +42,7 @@
             }
 
         .nav-link {
-            color: var(--text-light) !important;
+            color: white !important;
             font-weight: 500;
             margin: 0 8px;
             transition: all 0.3s ease;
@@ -113,19 +113,14 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Jogos</a>
+                            <a class="nav-link" asp-area="" asp-controller="MyUsers" asp-action="Index">Carteira</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Wishlist</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Profile">Perfil</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Suporte</a>
+
+                            <a class="nav-link" asp-area="" asp-controller="Games" asp-action="AllGames">Jogos</a>
                         </li>
                     </ul>
                     <partial name="_LoginPartial" />

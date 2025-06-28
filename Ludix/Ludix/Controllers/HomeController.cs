@@ -1,9 +1,11 @@
-using System.Diagnostics;
-using Ludix.Models;
 using Ludix.Data;
+using Ludix.Models;
+using Ludix.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
+using System.Diagnostics;
 
 namespace Ludix.Controllers
 {
@@ -45,18 +47,6 @@ namespace Ludix.Controllers
             }
 
             return View(featuredGames);
-        }
-
-        public async Task<IActionResult> Gaymes()
-        {
-            var games = await _context.Game
-                .Include(g => g.Reviews)
-                .Include(g => g.Developer)
-                .Include(g => g.Genres)
-                .OrderBy(g => g.Title)
-                .ToListAsync();
-
-            return View(games);
         }
 
         public IActionResult Profile()

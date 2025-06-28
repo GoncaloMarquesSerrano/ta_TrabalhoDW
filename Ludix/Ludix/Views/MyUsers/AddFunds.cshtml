@@ -1,0 +1,239 @@
+﻿@{
+    ViewData["Title"] = "Adicionar Fundos";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-credit-card"></i> Adicionar Fundos à Carteira</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="AddFunds" method="post">
+                        @Html.AntiForgeryToken()
+
+                        @if (!ViewData.ModelState.IsValid)
+                        {
+                            <div class="alert alert-danger">
+                                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                                {
+                                    <div>@error.ErrorMessage</div>
+                                }
+                            </div>
+                        }
+
+                        <div class="mb-4">
+                            <label for="amount" class="form-label">Valor a Adicionar *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">€</span>
+                                <input type="number" class="form-control" id="amount" name="amount"
+                                       required
+                                       placeholder="0,00" value="@ViewData["amount"]">
+                            </div>
+                            <small class="form-text text-muted">
+                                Valor mínimo: 1€
+                            </small>
+                        </div>
+
+                        <!-- Valores sugeridos -->
+                        <div class="mb-4">
+                            <label class="form-label">Valores Sugeridos:</label>
+                            <div class="row">
+                                <div class="col-6 col-md-3 mb-2">
+                                    <button type="button" class="btn btn-outline-primary w-100 suggested-amount" data-amount="10">
+                                        10€
+                                    </button>
+                                </div>
+                                <div class="col-6 col-md-3 mb-2">
+                                    <button type="button" class="btn btn-outline-primary w-100 suggested-amount" data-amount="25">
+                                        25€
+                                    </button>
+                                </div>
+                                <div class="col-6 col-md-3 mb-2">
+                                    <button type="button" class="btn btn-outline-primary w-100 suggested-amount" data-amount="50">
+                                        50€
+                                    </button>
+                                </div>
+                                <div class="col-6 col-md-3 mb-2">
+                                    <button type="button" class="btn btn-outline-primary w-100 suggested-amount" data-amount="100">
+                                        100€
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Método de Pagamento (simulado) -->
+                        <div class="mb-4">
+                            <label class="form-label">Método de Pagamento</label>
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-credit-card fa-2x text-primary me-3"></i>
+                                        <div>
+                                            <h6 class="mb-1">Cartão de Crédito/Débito</h6>
+                                            <small class="text-muted">Pagamento seguro e instantâneo</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <small class="form-text text-muted">
+                                <i class="fas fa-info-circle"></i>
+                                Isto é uma simulação. Nenhum pagamento real será processado.
+                            </small>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-plus-circle"></i> Adicionar Fundos
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Voltar à Carteira
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Informações adicionais -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6><i class="fas fa-shield-alt"></i> Segurança</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Transações seguras e criptografadas
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Sem taxas de transação
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Fundos disponíveis imediatamente
+                        </li>
+                        <li class="mb-0">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Suporte 24/7
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6><i class="fas fa-question-circle"></i> Perguntas Frequentes</h6>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq1">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1">
+                                    Quanto tempo demora?
+                                </button>
+                            </h2>
+                            <div id="collapse1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Os fundos são adicionados imediatamente após a confirmação do pagamento.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq2">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2">
+                                    Posso reembolsar?
+                                </button>
+                            </h2>
+                            <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Infelizmente, de momento, não aceitamos reembolsos.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq3">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3">
+                                    Há limites?
+                                </button>
+                            </h2>
+                            <div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    A carteira de um utilizador pode ter 10000€ no máximo.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const amountInput = document.getElementById('amount');
+            const suggestedButtons = document.querySelectorAll('.suggested-amount');
+
+            // lidar com os botões sugeridos
+            suggestedButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const amount = this.getAttribute('data-amount');
+                    amountInput.value = amount;
+
+                    // butões sugeridos ficam brilhantes
+                    suggestedButtons.forEach(btn => {
+                        btn.classList.remove('btn-primary');
+                        btn.classList.add('btn-outline-primary');
+                    });
+                    this.classList.remove('btn-outline-primary');
+                    this.classList.add('btn-primary');
+                });
+            });
+
+            // Input validation
+            amountInput.addEventListener('input', function() {
+                const value = parseFloat(this.value);
+                const submitButton = document.querySelector('button[type="submit"]');
+
+                if (value < 1 || value > 1000 || isNaN(value)) {
+                    this.classList.add('is-invalid');
+                    submitButton.disabled = true;
+                } else {
+                    this.classList.remove('is-invalid');
+                    submitButton.disabled = false;
+                }
+
+                // Reset suggested buttons
+                suggestedButtons.forEach(btn => {
+                    btn.classList.remove('btn-primary');
+                    btn.classList.add('btn-outline-primary');
+                });
+            });
+
+            // validação do formulário
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function(e) {
+                const amount = parseFloat(amountInput.value);
+
+                if (amount < 1 || amount > 1000 || isNaN(amount)) {
+                    e.preventDefault();
+                    alert('Por favor, insira um valor válido entre 1€ e 1000€.');
+                    return false;
+                }
+
+                // confirmação antes de adicionar fundos
+                if (!confirm(`Confirma a adição de ${amount.toFixed(2)}€ à sua carteira?`)) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        });
+    </script>
+}

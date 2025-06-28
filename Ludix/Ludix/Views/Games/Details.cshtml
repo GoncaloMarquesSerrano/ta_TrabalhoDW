@@ -1,14 +1,41 @@
 ﻿@model Ludix.Models.Game
 @{
     ViewData["Title"] = "Details";
+    
+    var currentUserId = ViewContext.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    
+    
+    // Verificar se é desenvolvedor ou admin
+    bool isDeveloper = Model.Developer?.AspUser == currentUserId;
+    bool isAdmin = ViewBag.IsAdmin != null ? (bool)ViewBag.IsAdmin : false;
+    bool canManageGame = isDeveloper || isAdmin;
+    
 }
 
 <div class="container mt-4">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
     <div class="row">
         <div class="col-lg-8">
             <div class="card">
                 <div class="card-header">
-                    <h2>@Model.Title</h2>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2>@Model.Title</h2>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -18,7 +45,9 @@
                         <div class="col-md-8">
                             <dl class="row">
                                 <dt class="col-sm-4">Preço:</dt>
-                                <dd class="col-sm-8"><strong class="text-success">@Model.Price.ToString("C")</strong></dd>
+                                <dd class="col-sm-8">
+                                    <strong class="text-success fs-4">@Model.Price.ToString("C")</strong>
+                                </dd>
                                 
                                 <dt class="col-sm-4">Data de Lançamento:</dt>
                                 <dd class="col-sm-8">@Model.ReleaseDate.ToString("dd/MM/yyyy")</dd>
@@ -55,6 +84,8 @@
                     }
                 </div>
             </div>
+
+            <!-- Secção de Avaliações -->
             <div class="card mt-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4 class="mb-0">Avaliações</h4>
@@ -69,10 +100,10 @@
                     }
                 </div>
                 <div class="card-body">
-                    @if (User.Identity.IsAuthenticated)
+                    @if (User.Identity.IsAuthenticated )
                     {
                         @* Verificar se o utilizador ja fez review para este jogo *@
-                            var userReview = Model.Reviews?.FirstOrDefault(r => r.MyUser?.AspUser == ViewContext.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
+                        var userReview = Model.Reviews?.FirstOrDefault(r => r.MyUser?.AspUser == currentUserId);
                         @if (userReview == null)
                         {
                             <!-- Formulario para criar nova review -->
@@ -130,7 +161,7 @@
                     {
                         <div class="alert alert-info">
                             <i class="fas fa-info-circle"></i>
-                            <a href="@Url.Action("Login", "Account", new { area = "Identity" })">Faça login</a> para avaliar este jogo.
+                            <p>Faça login para avaliar este jogo.</p>
                         </div>
                     }
 
@@ -146,6 +177,7 @@
                                             <div>
                                                 <h6 class="card-title mb-1">
                                                     @(review.MyUser?.Username ?? "Utilizador Anónimo")
+                                                    <span class="badge bg-success ms-2">Verificado</span>
                                                 </h6>
                                                 <div class="rating mb-2">
                                                     @for (int i = 1; i <= 5; i++)
@@ -189,152 +221,119 @@
             </div>
         </div>
 
-        <!-- Sidebar com acoes -->
+        <!-- Sidebar com ações -->
         <div class="col-lg-4">
             <div class="card">
                 <div class="card-header">
-                    <h5>Ações</h5>
+                    <h5 class="mb-0">
+                        <i class="fas fa-gamepad"></i> Ações do Jogo
+                    </h5>
                 </div>
                 <div class="card-body">
                     @if (User.Identity.IsAuthenticated)
                     {
-                            var currentUserId = ViewContext.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                            // Verificar se o utilizador e o desenvolvedor do jogo
-                            bool isDeveloper = Model.Developer?.AspUser == currentUserId;
-                            // Verificar se o utilizador e admin 
-                            bool isAdmin = ViewBag.IsAdmin != null ? (bool)ViewBag.IsAdmin : false;
-                            
-                            bool canManageGame = isDeveloper || isAdmin;
-                        @if (canManageGame)
-                        {
-                            <a asp-action="Edit" asp-route-id="@Model.GameId" class="btn btn-warning btn-block mb-2">
+                            <!-- Utilizador não possui o jogo -->
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span>Preço:</span>
+                                    <strong class="text-success fs-4">@Model.Price.ToString("C")</strong>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                </div>
+                            </div>
+                                <form asp-controller="Purchases" asp-action="Buy" asp-route-id="@Model.GameId" method="post">
+                                    <button type="submit" class="btn btn-success">Comprar por @Model.Price.ToString("C")</button>
+                                </form>
+                    }
+                    else
+                    {
+                        <!-- Utilizador não autenticado -->
+                        <div class="text-center mb-3">
+                            <i class="fas fa-user-lock fa-3x text-muted mb-3"></i>
+                            <h6>Faça login para comprar</h6>
+                        </div>
+                    }
+
+                    @if (canManageGame)
+                    {
+                        <!-- Ações de gestão para desenvolvedor/admin -->
+                        <hr>
+                        <h6 class="text-muted">
+                            <i class="fas fa-cog"></i> Gestão
+                            @if (isDeveloper)
+                            {
+                                <span class="badge bg-info ms-1">Desenvolvedor</span>
+                            }
+                            @if (isAdmin)
+                            {
+                                <span class="badge bg-danger ms-1">Admin</span>
+                            }
+                        </h6>
+                        <div class="d-grid gap-1">
+                            <a href="@Url.Action("Edit", "Games", new { id = Model.GameId })" class="btn btn-outline-warning btn-sm">
                                 <i class="fas fa-edit"></i> Editar Jogo
                             </a>
                             
-                            <a asp-action="Delete" asp-route-id="@Model.GameId" class="btn btn-danger btn-block mb-2"
-                               onclick="return confirm('Tem certeza que deseja eliminar este jogo? Esta ação não pode ser desfeita!')">
-                                <i class="fas fa-trash"></i> Eliminar Jogo
-                            </a>
-                        }
-                    }
-                    
-                    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary btn-block">
-                        <i class="fas fa-arrow-left"></i> Voltar à Lista
-                    </a>
-                    
-                    @if (User.Identity.IsAuthenticated)
-                    {
-                        <a href="#" class="btn btn-success btn-block mt-2">
-                            <i class="fas fa-shopping-cart"></i> Comprar (@Model.Price.ToString("C"))
-                        </a>
+                            @if (isAdmin)
+                            {
+                                <a href="@Url.Action("Index", "Purchase")" class="btn btn-outline-info btn-sm">
+                                    <i class="fas fa-chart-line"></i> Ver Vendas
+                                </a>
+                                <a href="@Url.Action("Delete", "Games", new { id = Model.GameId })" class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-trash"></i> Eliminar Jogo
+                                </a>
+                            }
+                        </div>
                     }
                 </div>
             </div>
 
-            <!-- Estatisticas das Reviews -->
-            @if (Model.Reviews != null && Model.Reviews.Any())
-            {
-                <div class="card mt-3">
-                    <div class="card-header">
-                        <h6>Estatísticas das Avaliações</h6>
-                    </div>
-                    <div class="card-body">
-                        @{
-                            var reviewStats = Model.Reviews.GroupBy(r => r.Rating)
-                                                          .OrderByDescending(g => g.Key)
-                                                          .ToDictionary(g => g.Key, g => g.Count());
-                            var totalReviews = Model.Reviews.Count();
-                        }
-                        
-                        @for (int rating = 5; rating >= 1; rating--)
-                        {
-                            var count = reviewStats.ContainsKey(rating) ? reviewStats[rating] : 0;
-                            var percentage = totalReviews > 0 ? (count * 100.0 / totalReviews) : 0;
-                            
-                            <div class="d-flex align-items-center mb-1">
-                                <span class="me-2">@rating ★</span>
-                                <div class="progress flex-grow-1 me-2" style="height: 15px;">
-                                    <div class="progress-bar bg-warning" role="progressbar" 
-                                         style="width: @percentage%" 
-                                         aria-valuenow="@percentage" aria-valuemin="0" aria-valuemax="100">
-                                    </div>
-                                </div>
-                                <small class="text-muted">@count</small>
+            <!-- Card com estatísticas do jogo -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-chart-bar"></i> Estatísticas
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="border-end">
+                                <h5 class="text-primary mb-0">@(Model.Purchases?.Count() ?? 0)</h5>
+                                <small class="text-muted">Vendas</small>
                             </div>
-                        }
+                        </div>
+                        <div class="col-6">
+                            <h5 class="text-warning mb-0">
+                                @if (Model.Reviews != null && Model.Reviews.Any())
+                                {
+                                    @Math.Round(Model.Reviews.Average(r => r.Rating), 1)
+                                }
+                                else
+                                {
+                                    <span class="text-muted">N/A</span>
+                                }
+                            </h5>
+                            <small class="text-muted">Avaliação</small>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="text-center">
+                        <small class="text-muted">
+                            Lançado em @Model.ReleaseDate.ToString("MMMM yyyy")
+                        </small>
                     </div>
                 </div>
-            }
+            </div>
+        </div>
+    </div>
+
+    <!-- Botão de voltar -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <a href="@Url.Action("Index", "Home")" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Voltar à Home
+            </a>
         </div>
     </div>
 </div>
-
-@section Scripts {
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const deleteButtons = document.querySelectorAll('a[href*="Delete"]');
-            deleteButtons.forEach(button => {
-                button.addEventListener('click', function(e) {
-                    if (!confirm('Tem certeza que deseja eliminar este item?')) {
-                        e.preventDefault();
-                    }
-                });
-            });
-
-            const ratingInputs = document.querySelectorAll('input[name="Rating"]');
-            const ratingLabels = document.querySelectorAll('.rating-input label');
-
-            ratingInputs.forEach((input, index) => {
-                input.addEventListener('change', function() {
-                    ratingLabels.forEach(label => {
-                        label.classList.remove('btn-warning');
-                        label.classList.add('btn-outline-warning');
-                    });
-                    for (let i = 0; i <= index; i++) {
-                        ratingLabels[i].classList.remove('btn-outline-warning');
-                        ratingLabels[i].classList.add('btn-warning');
-                    }
-                });
-            });
-
-            const reviewTextarea = document.getElementById('ReviewText');
-            if (reviewTextarea) {
-                const maxLength = 500;
-                const counterElement = document.createElement('small');
-                counterElement.className = 'form-text text-muted float-end';
-                reviewTextarea.parentNode.appendChild(counterElement);
-
-                function updateCounter() {
-                    const remaining = maxLength - reviewTextarea.value.length;
-                    counterElement.textContent = `${reviewTextarea.value.length}/${maxLength} caracteres`;
-                    
-                    if (remaining < 50) {
-                        counterElement.classList.remove('text-muted');
-                        counterElement.classList.add('text-warning');
-                    } else if (remaining < 0) {
-                        counterElement.classList.remove('text-warning');
-                        counterElement.classList.add('text-danger');
-                    } else {
-                        counterElement.classList.remove('text-warning', 'text-danger');
-                        counterElement.classList.add('text-muted');
-                    }
-                }
-
-                reviewTextarea.addEventListener('input', updateCounter);
-                reviewTextarea.setAttribute('maxlength', maxLength);
-                updateCounter(); 
-            }
-            const reviewForm = document.querySelector('form[action*="Reviews/Create"]');
-            if (reviewForm) {
-                reviewForm.addEventListener('submit', function(e) {
-                    const ratingSelected = document.querySelector('input[name="Rating"]:checked');
-                    if (!ratingSelected) {
-                        e.preventDefault();
-                        alert('Por favor, selecione uma classificação.');
-                        return false;
-                    }
-                });
-            }
-        });
-    </script>
-}

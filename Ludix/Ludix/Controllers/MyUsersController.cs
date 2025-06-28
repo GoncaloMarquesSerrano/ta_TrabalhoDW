@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Ludix.Data;
+using Ludix.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Ludix.Data;
-using Ludix.Models;
-using Microsoft.AspNetCore.Authorization;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Ludix.Controllers
 {
@@ -24,136 +25,70 @@ namespace Ludix.Controllers
         // GET: MyUsers
         public async Task<IActionResult> Index()
         {
-            return View(await _context.MyUser.ToListAsync());
-        }
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var user = await _context.MyUser
+                .Include(u => u.Purchases)
+                    .ThenInclude(p => p.Game)
+                .FirstOrDefaultAsync(u => u.AspUser == currentUserId);
 
-        // GET: MyUsers/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
+            if (user == null)
             {
-                return NotFound();
+                return NotFound("Utilizador não encontrado.");
             }
 
-            var myUser = await _context.MyUser
-                .FirstOrDefaultAsync(m => m.UserId == id);
-            if (myUser == null)
-            {
-                return NotFound();
-            }
-
-            return View(myUser);
+            return View(user);
         }
 
-        // GET: MyUsers/Create
-        public IActionResult Create()
+        // GET: MyUsers/AddFunds
+        public IActionResult AddFunds()
         {
             return View();
         }
 
-        // POST: MyUsers/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: MyUsers/AddFunds
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UserId,Username,Email,Balance,CreatedAt,AspUser")] MyUser myUser)
+        public async Task<IActionResult> AddFunds(decimal amount)
         {
-            if (ModelState.IsValid)
+            if (amount <= 0)
             {
-                _context.Add(myUser);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(myUser);
-        }
-
-        // GET: MyUsers/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
+                ModelState.AddModelError("", "O valor deve ser superior a zero.");
+                return View();
             }
 
-            var myUser = await _context.MyUser.FindAsync(id);
-            if (myUser == null)
-            {
-                return NotFound();
-            }
-            return View(myUser);
-        }
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var user = await _context.MyUser.FirstOrDefaultAsync(u => u.AspUser == currentUserId);
 
-        // POST: MyUsers/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("UserId,Username,Email,Balance,CreatedAt,AspUser")] MyUser myUser)
-        {
-            if (id != myUser.UserId)
+            if (user == null)
             {
-                return NotFound();
+                return NotFound("Utilizador não encontrado.");
             }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(myUser);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!MyUserExists(myUser.UserId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(myUser);
-        }
-
-        // GET: MyUsers/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var myUser = await _context.MyUser
-                .FirstOrDefaultAsync(m => m.UserId == id);
-            if (myUser == null)
-            {
-                return NotFound();
-            }
-
-            return View(myUser);
-        }
-
-        // POST: MyUsers/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var myUser = await _context.MyUser.FindAsync(id);
-            if (myUser != null)
-            {
-                _context.MyUser.Remove(myUser);
-            }
-
+            user.Balance += amount;
             await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = $"Saldo adicionado com sucesso! Novo saldo: {user.Balance:C}";
             return RedirectToAction(nameof(Index));
         }
 
-        private bool MyUserExists(int id)
+
+        // GET: MyUsers/Library
+        public async Task<IActionResult> Library()
         {
-            return _context.MyUser.Any(e => e.UserId == id);
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var user = await _context.MyUser
+                .Include(u => u.Purchases)
+                    .ThenInclude(p => p.Game)
+                        .ThenInclude(g => g.Genres)
+                .FirstOrDefaultAsync(u => u.AspUser == currentUserId);
+
+            if (user == null)
+            {
+                return NotFound("Utilizador não encontrado.");
+            }
+
+            var purchasedGames = user.Purchases.OrderByDescending(p => p.PurchaseDate).ToList();
+            return View(purchasedGames);
         }
     }
 }

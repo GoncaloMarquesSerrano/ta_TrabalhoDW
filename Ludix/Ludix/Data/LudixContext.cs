@@ -21,6 +21,13 @@ namespace Ludix.Data
             // Configure TPT inheritance
             modelBuilder.Entity<MyUser>().ToTable("Users");
             modelBuilder.Entity<Developer>().ToTable("Developers");
+
+            modelBuilder.Entity<Game>()
+            .HasOne(g => g.Developer)
+            .WithMany()
+            .HasForeignKey(g => g.DeveloperFk)
+            .IsRequired()
+            .HasPrincipalKey(d => d.UserId);
         }
 
         public DbSet<Ludix.Models.Review> Review { get; set; } = default!;

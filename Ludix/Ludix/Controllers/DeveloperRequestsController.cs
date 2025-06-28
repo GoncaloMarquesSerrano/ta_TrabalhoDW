@@ -33,13 +33,13 @@ namespace Ludix.Controllers
                 return NotFound();
             }
 
-            // Verificar se é um admin
+            // Verificar se  um admin
             if (!currentUser.IsAdmin)
             {
                 return RedirectToAction("AccessDenied", "Account", new { area = "Identity" });
             }
 
-            // Obter as solicitações pendentes
+            // Obter as solicitacoes pendentes
             var pendingRequests = await _context.MyUser
                 .Where(u => u.RequestedDeveloper && !_context.Developer.Any(d => d.UserId == u.UserId))
                 .ToListAsync();
@@ -175,7 +175,7 @@ namespace Ludix.Controllers
                 return NotFound();
             }
 
-            // Remover a solicitação
+            // Remover a solicitacao
             requestingUser.RequestedDeveloper = false;
             requestingUser.ProposedWebsite = null;
             requestingUser.DeveloperRequestDate = null;

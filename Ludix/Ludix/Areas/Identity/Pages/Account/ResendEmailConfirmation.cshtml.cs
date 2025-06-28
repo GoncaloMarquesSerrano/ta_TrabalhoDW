@@ -76,13 +76,38 @@ namespace Ludix.Areas.Identity.Pages.Account
                 pageHandler: null,
                 values: new { userId = userId, code = code },
                 protocol: Request.Scheme);
-            await _emailSender.SendEmailAsync(
-                Input.Email,
-                "Confirm your email",
-                $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+            await _emailSender.SendEmailAsync(Input.Email, "Confirme a sua conta - Sistema Ludix",
+                            GetConfirmationEmailBody(callbackUrl, Input.Email));
 
             ModelState.AddModelError(string.Empty, "Verification email sent. Please check your email.");
             return Page();
+        }
+        private string GetConfirmationEmailBody(string callbackUrl, string email)
+        {
+            return $@"
+        <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>
+            <h2 style='color: #333;'>Bem-vindo ao Ludix!</h2>
+            <p>Bom dia,</p>
+            <p>Obrigado por se registar no Ludix. Para concluir o seu registo, confirme o seu endereço de email.</p>
+            
+            <div style='text-align: center; margin: 30px 0;'>
+                <a href='{HtmlEncoder.Default.Encode(callbackUrl)}' 
+                   style='background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;'>
+                   Confirmar Email
+                </a>
+            </div>
+            
+            <p>Se o botão acima não funcionar, copie e cole este link no seu browser:</p>
+            <p style='word-break: break-all; color: #666;'>{HtmlEncoder.Default.Encode(callbackUrl)}</p>
+            
+            <hr style='margin: 30px 0; border: none; border-top: 1px solid #eee;'>
+            <p style='color: #666; font-size: 12px;'>
+                Se não se registou no Ludix, pode ignorar este email.
+            </p>
+            <p style='color: #666; font-size: 12px;'>
+                Equipa Ludix
+            </p>
+        </div>";
         }
     }
 }

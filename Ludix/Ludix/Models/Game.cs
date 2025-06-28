@@ -77,18 +77,18 @@ public class Game
     /// Lista dos generos do jogo
     /// </summary>
     [Display(Name = "Géneros")]
-    public ICollection<Genre> Genres { get; set; } = [];
+    public ICollection<Genre> Genres { get; set; } = new List<Genre>();
 
     /// <summary>
     /// Lista de utilizadores que compraram o jogo
     /// </summary>
     [Display(Name = "Compras")]
-    public ICollection<Purchase> Purchases { get; set; } = [];
+    public ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();
 
     /// <summary>
     /// Lista das reviews do jogo feitas pelo utilizador
     /// </summary>
     [Display(Name = "Avaliações")]
-    public ICollection<Review> Reviews { get; set; } = [];
+    public ICollection<Review> Reviews { get; set; } = new List<Review>();
 
 }

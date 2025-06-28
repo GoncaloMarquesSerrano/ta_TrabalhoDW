@@ -1,6 +1,30 @@
-﻿@page
+﻿@* Areas/Identity/Pages/Account/ConfirmEmail.cshtml *@
+@page
 @model ConfirmEmailModel
 @{
+    ViewData["Title"] = "Confirmar email";
+}
+
+<h1>@ViewData["Title"]</h1>
+<div>
+    <p>
+        @Model.StatusMessage
+    </p>
+
+    @if (Model.StatusMessage == "Obrigado por confirmar o seu email. Já pode fazer login.")
+    {
+        <p>
+            <a asp-page="./Login">Clique aqui para fazer login</a>
+        </p>
+    }
+    else
+    {
+        <p>
+            <a asp-page="./Register">Voltar ao registo</a>
+        </p>
+    }
+</div>
+=======
     ViewData["Title"] = "Confirmação de Email";
 }
 

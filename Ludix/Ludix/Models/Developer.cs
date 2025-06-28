@@ -30,6 +30,7 @@ namespace Ludix.Models
         /// </summary>
         [ForeignKey("ApprovedByUserId")]
         public virtual MyUser ApprovedBy { get; set; } = null!;
+
     }
 }
 

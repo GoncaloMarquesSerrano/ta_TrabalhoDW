@@ -118,29 +118,70 @@ namespace Ludix.Controllers
         }
 
         // POST: Reviews/Create
+        // POST: Reviews/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("GameId,Rating,ReviewText")] Review review)
         {
-            var userId = _context.MyUser
-                   .FirstOrDefault(u => u.AspUser == User.FindFirstValue(ClaimTypes.NameIdentifier))?.UserId;
 
-            if (userId == null)
-                return Forbid(); // Utilizador nao autenticado corretamente
+            // Obter o ID do utilizador ASP.NET Identity
+            var aspUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            review.UserId = userId.Value;
-            review.ReviewDate = DateTime.Now;
-
-            if (ModelState.IsValid)
+            if (string.IsNullOrEmpty(aspUserId))
             {
-                review.Game = null;
-                _context.Add(review);
-                await _context.SaveChangesAsync();
+                TempData["Error"] = "Utilizador não autenticado.";
                 return RedirectToAction("Details", "Games", new { id = review.GameId });
             }
 
+            // Procurar o MyUser correspondente
+            var currentUser = await _context.MyUser
+                .FirstOrDefaultAsync(u => u.AspUser == aspUserId);
 
-            // Reencaminhar com erro, neste caso volta ao jogo
+            if (currentUser == null)
+            {
+                TempData["Error"] = "Perfil de utilizador não encontrado. Contacte o administrador.";
+                return RedirectToAction("Details", "Games", new { id = review.GameId });
+            }
+
+<<<<<<< Goncalo
+            // Verificar se já existe uma review deste utilizador para este jogo
+            var existingReview = await _context.Review
+                .FirstOrDefaultAsync(r => r.GameId == review.GameId && r.UserId == currentUser.UserId);
+
+            if (existingReview != null)
+            {
+                TempData["Error"] = "Já fez uma avaliação para este jogo. Pode editá-la se desejar.";
+                return RedirectToAction("Edit", new { id = existingReview.ReviewId });
+            }
+
+            // Configurar a review
+            review.UserId = currentUser.UserId;
+            review.ReviewDate = DateTime.Now;
+            review.Game = null; // Evitar problemas de tracking
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Add(review);
+                    await _context.SaveChangesAsync();
+
+                    TempData["Success"] = "Avaliação criada com sucesso!";
+                    return RedirectToAction("Details", "Games", new { id = review.GameId });
+                }
+                catch (Exception ex)
+                {
+                    TempData["Error"] = "Erro na criação da review. Tente novamente.";
+                }
+            }
+            else
+            {
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    System.Diagnostics.Debug.WriteLine($"  Validation Error: {error.ErrorMessage}");
+                }
+                TempData["Error"] = "Dados inválidos. Verifique os campos obrigatórios.";
+            }
             return RedirectToAction("Details", "Games", new { id = review.GameId });
 
         }
@@ -352,14 +393,24 @@ namespace Ludix.Controllers
 
         private async Task<MyUser> GetCurrentUserAsync()
         {
-            var identityUser = await _userManager.GetUserAsync(User);
-            if (identityUser == null)
+            // Obter o ID do utilizador ASP.NET Identity
+            var aspUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(aspUserId))
             {
                 return null;
             }
 
-            return await _context.MyUser
-                .FirstOrDefaultAsync(u => u.AspUser == identityUser.Id);
+            // Procurar o MyUser correspondente
+            var myUser = await _context.MyUser
+                .FirstOrDefaultAsync(u => u.AspUser == aspUserId);
+
+            // DEBUG: Log para verificar o que está acontecendo
+            System.Diagnostics.Debug.WriteLine($"ASP User ID: {aspUserId}");
+            System.Diagnostics.Debug.WriteLine($"MyUser found: {(myUser != null ? myUser.UserId.ToString() : "NULL")}");
+            System.Diagnostics.Debug.WriteLine($"MyUser Username: {myUser?.Username ?? "NULL"}");
+
+            return myUser;
         }
     }
 }
