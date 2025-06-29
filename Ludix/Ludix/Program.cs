@@ -79,6 +79,20 @@ builder.Services.AddControllers()
 
 var app = builder.Build();
 
+// Seed da base de dados
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        await SeedData.SeedAsync(scope.ServiceProvider);
+    }
+    catch (Exception ex)
+    {
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Erro ao fazer seed da base de dados.");
+    }
+}
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
