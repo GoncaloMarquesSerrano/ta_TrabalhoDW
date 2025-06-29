@@ -202,37 +202,6 @@
                 <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Reenviar confirmação por email</a>
             </div>
         </form>
-
-        <div class="divider">OU</div>
-        
-        <h3>Acesse com outro serviço</h3>
-        
-        <div class="external-logins-container">
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
-                    <div class="text-center">
-                        <p>
-                            Não há serviços de autenticação externos configurados. Consulte este 
-                            <a href="https://go.microsoft.com/fwlink/?LinkID=532715" style="color: var(--accent-gold);">artigo</a>.
-                        </p>
-                    </div>
-                }
-                else
-                {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            @foreach (var provider in Model.ExternalLogins!)
-                            {
-                                <button type="submit" class="btn external-login-btn" name="provider" value="@provider.Name" title="Acesse com sua conta @provider.DisplayName">
-                                    @provider.DisplayName
-                                </button>
-                            }
-                        </div>
-                    </form>
-                }
-            }
-        </div>
     </section>
 </div>
 
