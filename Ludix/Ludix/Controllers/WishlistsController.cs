@@ -22,7 +22,7 @@ namespace Ludix.Controllers
         // GET: Wishlists
         public async Task<IActionResult> Index()
         {
-            var ludixContext = _context.WishlistItems.Include(w => w.Game).Include(w => w.User);
+            var ludixContext = _context.Wishlist.Include(w => w.Game).Include(w => w.User);
             return View(await ludixContext.ToListAsync());
         }
 
@@ -34,7 +34,7 @@ namespace Ludix.Controllers
                 return NotFound();
             }
 
-            var wishlist = await _context.WishlistItems
+            var wishlist = await _context.Wishlist
                 .Include(w => w.Game)
                 .Include(w => w.User)
                 .FirstOrDefaultAsync(m => m.WishlistId == id);
@@ -80,7 +80,7 @@ namespace Ludix.Controllers
                 return NotFound();
             }
 
-            var wishlist = await _context.WishlistItems.FindAsync(id);
+            var wishlist = await _context.Wishlist.FindAsync(id);
             if (wishlist == null)
             {
                 return NotFound();
@@ -135,7 +135,7 @@ namespace Ludix.Controllers
                 return NotFound();
             }
 
-            var wishlist = await _context.WishlistItems
+            var wishlist = await _context.Wishlist
                 .Include(w => w.Game)
                 .Include(w => w.User)
                 .FirstOrDefaultAsync(m => m.WishlistId == id);
@@ -152,10 +152,10 @@ namespace Ludix.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var wishlist = await _context.WishlistItems.FindAsync(id);
+            var wishlist = await _context.Wishlist.FindAsync(id);
             if (wishlist != null)
             {
-                _context.WishlistItems.Remove(wishlist);
+                _context.Wishlist.Remove(wishlist);
             }
 
             await _context.SaveChangesAsync();
@@ -164,7 +164,7 @@ namespace Ludix.Controllers
 
         private bool WishlistExists(int id)
         {
-            return _context.WishlistItems.Any(e => e.WishlistId == id);
+            return _context.Wishlist.Any(e => e.WishlistId == id);
         }
     }
 }
