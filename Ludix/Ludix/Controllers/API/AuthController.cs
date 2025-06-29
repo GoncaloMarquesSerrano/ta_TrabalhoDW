@@ -15,8 +15,10 @@ using System.Security.Claims;
 using System.Text;
 using Ludix.Models.ViewModels;
 
+
 namespace AppFotos.Controllers.API
 {
+    // código fornecido pelo professor para a autenticação JWT
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase

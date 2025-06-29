@@ -46,6 +46,8 @@ builder.Services.AddAuthorization(options =>
 builder.Services.Configure<SendGridSettings>(builder.Configuration.GetSection("SendGrid"));
 builder.Services.AddTransient<IEmailSender, SendGridEmailSender>();
 
+
+// código fornecido pelo professor para configurar o jwt
 // JWT Settings
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);

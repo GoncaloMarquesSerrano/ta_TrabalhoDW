@@ -4,6 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
+// código fornecido pelo professor para gerar o token JWT
 public class TokenService
 {
 

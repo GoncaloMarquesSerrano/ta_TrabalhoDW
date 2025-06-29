@@ -91,6 +91,7 @@ namespace Ludix.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
+        // código fornecido pelo professor para a inserção de imagens
         public async Task<IActionResult> Create(Game game, IFormFile cover, int[] selectedGenres, int? selectedDeveloperId)
         {
             bool hasError = false;
