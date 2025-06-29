@@ -3,10 +3,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ludix.Models
 {
-    public class WishlistItem
+    public class Wishlist
     {
         [Key]
-        public int WishlistItemId { get; set; }
+        public int WishlistId { get; set; }
 
         [Required]
         public int GameId { get; set; }

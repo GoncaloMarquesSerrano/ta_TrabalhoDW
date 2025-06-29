@@ -47,6 +47,6 @@ namespace Ludix.Models
         public ICollection<Genre> Genres { get; set; } = new List<Genre>();
         public ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
-        public ICollection<WishlistItem> WishlistItems { get; set; } = [];
+        public ICollection<Wishlist> Wishlist { get; set; } = [];
     }
 }

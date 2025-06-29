@@ -29,7 +29,7 @@ namespace Ludix.Data
         public DbSet<Ludix.Models.Developer> Developer { get; set; } = default!;
         public DbSet<Ludix.Models.Game> Game { get; set; } = default!;
         public DbSet<Ludix.Models.Genre> Genre { get; set; } = default!;
-        public DbSet<Ludix.Models.WishlistItem> WishlistItems { get; set; } = default!;
+        public DbSet<Ludix.Models.Wishlist> WishlistItems { get; set; } = default!;
         public DbSet<Ludix.Models.Purchase> Purchase { get; set; }
     }
 }

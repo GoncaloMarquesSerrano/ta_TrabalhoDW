@@ -82,7 +82,7 @@ namespace Ludix.Models
         /// </summary>
         public ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();
 
-        public ICollection<WishlistItem> WishlistItems { get; set; } = new List<WishlistItem>();
+        public ICollection<Wishlist> Wishlist { get; set; } = new List<Wishlist>();
     }
 }
 
